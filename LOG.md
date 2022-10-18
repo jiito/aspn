@@ -30,3 +30,13 @@
    - Planned sprint tasks for week of work.
  - READ:
    - https://www.wired.com/2017/06/pied-pipers-new-internet-isnt-just-possible-almost/
+
+ DATE: 10-17-2022
+
+ - DESCRIPTION:
+   - Found open source framework for building microservices with Wasm.
+   - Read articles on how web services could be build using Wasm.
+   - Began exploring using Spin as a starting point for building a network with these webservices.
+ - READ:
+   - https://www.wasm.builders/fermyon/rethinking-microservices-with-webassembly-and-spin-1gh3
+   - https://webassembly.org/docs/security/
