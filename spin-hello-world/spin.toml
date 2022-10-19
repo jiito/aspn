@@ -1,0 +1,14 @@
+spin_version = "1"
+authors = ["jiito <benjamin.allanrahill@gmail.com>"]
+description = "test app using spin framwork"
+name = "spin-hello-world"
+trigger = { type = "http", base = "/" }
+version = "0.1.0"
+
+[[component]]
+id = "spin-hello-world"
+source = "target/wasm32-wasi/release/spin_hello_world.wasm"
+[component.trigger]
+route = "/test"
+[component.build]
+command = "cargo build --target wasm32-wasi --release"
