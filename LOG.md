@@ -61,3 +61,24 @@
    - https://www.techtarget.com/searchitoperations/tip/Follow-these-6-steps-to-deploy-microservices-in-production
    - https://www.fermyon.com/blog/webassembly-component-model
    - https://spin.fermyon.dev/
+
+ DATE: 10-20-2022
+
+ - DESCRIPTION:
+   - Meeting with Pete.
+   - Starting to work on building the initial structure of the internal api by
+     being specific and working through a specific example of a user using the
+     application.
+   - Investigated tradeoffs of certain file storage solutinons (Google Cloud
+     Provider and AWS S3).
+   - Investiaged which database to use as a backing for the uploading and
+     retrieval of files.
+ - READ:
+   - https://developers.redhat.com/blog/2015/04/30/how-to-load-test-and-tune-performance-on-your-api
+   - https://www.rust-lang.org/what/networking
+   - https://www.reddit.com/r/rust/comments/cs2794/best_resources_for_learning_network_programming/
+   - https://docs.rs/socket2/0.3.11/socket2/
+   - https://cloudmounter.net/amazon-s3-vs-google-cloud-storage/
+   - https://cloud.netapp.com/blog/cvo-blg-understanding-google-cloud-storage-costs#h_h2
+   - https://hub.qovery.com/guides/tutorial/create-a-blazingly-fast-api-in-rust-part-1/
+   -
