@@ -11,3 +11,5 @@ Cargo.lock
 
 keys.txt
 /pando/.env
+/pando/target/
+Cargo.lock
