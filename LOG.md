@@ -82,3 +82,18 @@
    - https://cloud.netapp.com/blog/cvo-blg-understanding-google-cloud-storage-costs#h_h2
    - https://hub.qovery.com/guides/tutorial/create-a-blazingly-fast-api-in-rust-part-1/
    -
+
+ DATE: 10-21-2022
+
+ - DESCRIPTION:
+   - Connected to the Cloud SQL instance.
+   - Designed and diagramed the API endpoints.
+
+ DATE: 10-23-2022
+
+ - DESCRIPTION:
+   - Worked through a tutorial setting up migrations with diesel and Postgres
+   -
+ - READ:
+   - https://thomaslevesque.com/2020/03/28/using-the-oauth-2-0-device-flow-to-authenticate-users-in-desktop-apps/?utm_source=pocket_mylist
+   - https://hasinthaindrajee.medium.com/browser-sso-for-cli-applications-b0be743fa656?utm_source=pocket_mylist
