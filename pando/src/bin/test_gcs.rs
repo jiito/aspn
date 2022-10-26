@@ -1,6 +1,7 @@
 use pando::storage;
 
-fn main() {
-    storage::gcs::upload_file();
-    storage::gcs::download_file();
+#[tokio::main]
+async fn main() {
+    storage::gcs::upload_file().await;
+    // storage::gcs::download_file();
 }
