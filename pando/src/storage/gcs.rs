@@ -2,17 +2,15 @@ use reqwest::{
     header::{self, HeaderMap},
     Body,
 };
+use std::path::PathBuf;
 use tokio::fs::File;
 
-pub async fn upload_file(
-    file_path: String,
-    oauth_token: String,
-    object_name: String,
-    bucket_name: String,
-) {
+use gcp_auth::{AuthenticationManager, CustomServiceAccount};
+
+pub async fn upload_file(oauth_token: String) {
     let file_location = String::from("/Users/bjar/foo.txt");
     let object_content_type = "text/plain";
-    let object_name = "testObject";
+    let object_name = "testObject2";
     let bucket_name = "aspn_functions";
 
     // open file
@@ -55,4 +53,12 @@ async fn request_gcp(
         .await?;
 
     Ok(response)
+}
+pub async fn get_gcp_token() -> String {
+    let credentials_path = PathBuf::from("/Users/bjar/service-account.json");
+    let service_account = CustomServiceAccount::from_file(credentials_path).unwrap();
+    let authentication_manager = AuthenticationManager::from(service_account);
+    let scopes = &["https://www.googleapis.com/auth/cloud-platform"];
+    let token = authentication_manager.get_token(scopes).await.unwrap();
+    String::from(token.as_str())
 }
