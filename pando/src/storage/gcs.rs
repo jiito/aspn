@@ -1,3 +1,4 @@
+use jwt_simple::prelude::*;
 use reqwest::{
     header::{self, HeaderMap},
     Body,
@@ -55,4 +56,15 @@ async fn request_gcp(
         .await?;
 
     Ok(response)
+}
+
+pub fn create_jwt() -> String {
+    let key = HS256Key::generate();
+
+    let claims = Claims::create(Duration::from_hours(2));
+    let token = key.authenticate(claims).unwrap();
+
+    println!("{:?}", token);
+
+    token
 }
