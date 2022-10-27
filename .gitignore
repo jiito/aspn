@@ -13,3 +13,4 @@ keys.txt
 /pando/.env
 /pando/target/
 Cargo.lock
+/pando/client_secret_917894126651-bc9u7cjho4u2ncqhssfs0579ehlel7av.apps.googleusercontent.com.json
