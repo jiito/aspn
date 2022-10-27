@@ -11,7 +11,6 @@ pub async fn upload_file(
     bucket_name: String,
 ) {
     let file_location = String::from("/Users/bjar/foo.txt");
-    let oauth_token = String::from("ya29.a0Aa4xrXP6IhG3rWKi-5uAbykp_tbTBgWTifE-MQREPsrN6pS45C_QRy6uRWwadK7DvkdHvJDl89hmTFq5yThdFob-wLvMDyc2m2oxr7ypjxYZgoo_mQJg7ngXcMFTo6_4JpgXrpCpK4p8m27gc5LkikYQaPbXaCgYKATASARISFQEjDvL9sFegKq_LX08Zg4NpvZqrjQ0163");
     let object_content_type = "text/plain";
     let object_name = "testObject";
     let bucket_name = "aspn_functions";
