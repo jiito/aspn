@@ -13,14 +13,12 @@ use tokio::fs::File;
 
 use ring::{rand, signature};
 
-pub async fn upload_file(oauth_token: String) {
-    let file_location = String::from("/Users/bjar/foo.txt");
+pub async fn upload_file(filename: String, oauth_token: String) {
     let object_content_type = "text/plain";
-    let object_name = "testObject2";
     let bucket_name = "aspn_functions";
 
     // open file
-    let file = File::open(file_location).await.unwrap();
+    let file = File::open(filename.clone()).await.unwrap();
     let body = Body::from(file);
 
     let mut headers = header::HeaderMap::new();
@@ -29,7 +27,7 @@ pub async fn upload_file(oauth_token: String) {
         header::HeaderValue::from_str(object_content_type).unwrap(),
     );
 
-    let uri = format!("https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={object_name}");
+    let uri = format!("https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={filename}");
 
     let res = request_gcp(uri, headers, body, oauth_token).await;
 
