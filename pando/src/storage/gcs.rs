@@ -7,16 +7,9 @@ use reqwest::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 // use signature::{RandomizedSigner, Signature, Signer, Verifier};
+use rsa::pkcs8::{DecodePrivateKey, EncodePrivateKey};
 use std::{collections::HashMap, fs, io::Error, path::PathBuf};
 use tokio::fs::File;
-
-use gcp_auth::{AuthenticationManager, CustomServiceAccount};
-use rsa::{
-    pkcs1::DecodeRsaPrivateKey,
-    pkcs1v15::SigningKey,
-    pkcs8::{DecodePrivateKey, EncodePrivateKey},
-    PaddingScheme, PublicKey, RsaPrivateKey, RsaPublicKey,
-};
 
 use ring::{rand, signature};
 
@@ -66,14 +59,6 @@ async fn request_gcp(
         .await?;
 
     Ok(response)
-}
-pub async fn get_gcp_token() -> String {
-    let credentials_path = PathBuf::from("/Users/bjar/service-account.json");
-    let service_account = CustomServiceAccount::from_file(credentials_path).unwrap();
-    let authentication_manager = AuthenticationManager::from(service_account);
-    let scopes = &["https://www.googleapis.com/auth/cloud-platform"];
-    let token = authentication_manager.get_token(scopes).await.unwrap();
-    String::from(token.as_str())
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -193,7 +178,7 @@ pub async fn generate_signed_url(
     //
     // let mut rng = rand::thread_rng();
 
-    let private_key = RsaPrivateKey::from_pkcs8_pem(&service_account.private_key).unwrap();
+    let private_key = rsa::RsaPrivateKey::from_pkcs8_pem(&service_account.private_key).unwrap();
     let pk_der = private_key.to_pkcs8_der().unwrap();
 
     // let public_key = RsaPublicKey::from(&private_key);
