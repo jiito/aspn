@@ -175,21 +175,13 @@ pub async fn generate_signed_url(
     .join("\n");
 
     //Sign the string-to-sign using an RSA signature with SHA-256.
-    //
-    // let mut rng = rand::thread_rng();
 
     let private_key = rsa::RsaPrivateKey::from_pkcs8_pem(&service_account.private_key).unwrap();
     let pk_der = private_key.to_pkcs8_der().unwrap();
 
-    // let public_key = RsaPublicKey::from(&private_key);
     let key_pair = ring::signature::RsaKeyPair::from_pkcs8(pk_der.as_bytes()).unwrap();
 
     // Encrypt
-    // let signing_key = SigningKey::<Sha256>::new(private_key);
-    // let enc_data = signing_key.sign(&string_to_sign.as_bytes());
-    // let enc_data = private_key.sign(PaddingScheme::PKCS1v15Sign { hash_len: None , prefix: Box }, &string_to_sign.as_bytes())
-
-    // let signature = hex::encode(enc_data.
     let mut signed_buffer = vec![0; key_pair.public_modulus_len()];
 
     key_pair.sign(

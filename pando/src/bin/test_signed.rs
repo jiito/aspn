@@ -13,7 +13,4 @@ async fn main() {
     .await
     .unwrap();
     println!("{}", url)
-    // storage::gcs::download_file();
-
-    // storage::util::upload_file().await;
 }
