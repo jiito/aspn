@@ -7,7 +7,7 @@ use reqwest::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 // use signature::{RandomizedSigner, Signature, Signer, Verifier};
-use std::{collections::HashMap, fs, path::PathBuf};
+use std::{collections::HashMap, fs, io::Error, path::PathBuf};
 use tokio::fs::File;
 
 use gcp_auth::{AuthenticationManager, CustomServiceAccount};
@@ -94,33 +94,23 @@ pub async fn generate_signed_url(
     expriation: Option<u32>,
     http_method: String,
     headers: Option<HashMap<String, String>>,
-) {
+) -> Result<String, Error> {
     let expiration = expriation.unwrap_or(604800).to_string();
-    print!("Service Account File: {service_account_file}");
-    print!("Bucket Name: {bucket_name}");
-    print!("Object Name: {object_name}");
+
     // construct cannonical request
     let mut escaped_obj = String::new();
     let slice_obj = url_escape::encode_path_to_string(object_name, &mut escaped_obj);
-    let cannonical_url = format!("/{}", escaped_obj);
-
-    println!("Cannoncical_url: {cannonical_url}");
+    let cannonical_url = format!("/{}", slice_obj);
 
     // Get the current time and create a req timestamp
-    // let now = Utc::now();
-    // let request_timestamp = now.format("%Y%m%dT%H%M%SZ").to_string();
-    // let datestamp = now.format("%Y%m%d");
-    //
-    let request_timestamp = String::from("20221101T123933Z");
-    let datestamp = String::from("20221101");
-    // Get service account
-    //
+
+    let now = Utc::now();
+    let request_timestamp = now.format("%Y%m%dT%H%M%SZ").to_string();
+    let datestamp = now.format("%Y%m%d");
 
     let json_file = fs::read_to_string(service_account_file).expect("Unable to read file");
     let service_account: ServiceAccount =
         serde_json::from_str(&json_file).expect("JSON was not well-formatted");
-    // Get the credential scope
-    //
 
     // Form the credential
     //
@@ -139,7 +129,6 @@ pub async fn generate_signed_url(
     ordered_headers.sort_by_key(|t| t.1);
 
     for (key, value) in ordered_headers.iter() {
-        println!("{}: {value}", key);
         let lower_k = key.to_lowercase();
         let strip_v = value.to_lowercase();
         cannonical_headers.push_str(&format!("{}:{}\n", lower_k, strip_v));
@@ -184,15 +173,11 @@ pub async fn generate_signed_url(
     ]
     .join("\n");
 
-    println!("CANONICAL REQUEST: {canonical_request}");
-
     let mut hasher = Sha256::new();
 
     hasher.update(canonical_request);
 
     let cr_hash = hex::encode(hasher.finalize());
-
-    println!("CR HASH: {}", cr_hash);
 
     // Construct the string-to-sign.
 
@@ -204,18 +189,13 @@ pub async fn generate_signed_url(
     ]
     .join("\n");
 
-    println!("STRING TO SIGN: {}", string_to_sign);
-
     //Sign the string-to-sign using an RSA signature with SHA-256.
     //
     // let mut rng = rand::thread_rng();
 
-    println!("{:?}", service_account.private_key);
     let private_key = RsaPrivateKey::from_pkcs8_pem(&service_account.private_key).unwrap();
-    println!("{:?}", private_key);
     let pk_der = private_key.to_pkcs8_der().unwrap();
 
-    println!("{:?}", pk_der.as_bytes());
     // let public_key = RsaPublicKey::from(&private_key);
     let key_pair = ring::signature::RsaKeyPair::from_pkcs8(pk_der.as_bytes()).unwrap();
 
@@ -236,8 +216,6 @@ pub async fn generate_signed_url(
 
     let signature = hex::encode(signed_buffer);
 
-    println!("SIGNATURE: {:?}", signature);
-
     let scheme_and_host = format!("https://{host}");
 
     let signed_url = format!(
@@ -248,5 +226,5 @@ pub async fn generate_signed_url(
         signature
     );
 
-    println!("{:?}", signed_url)
+    Ok(signed_url)
 }
