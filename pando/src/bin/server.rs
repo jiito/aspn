@@ -6,8 +6,8 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new().route(
-            "/upload",
-            web::post().to(pando::storage::file::upload_handler),
+            "/signed_url",
+            web::get().to(pando::api::handlers::signed_url_handler),
         )
     })
     .bind(("127.0.0.1", 8080))?
