@@ -34,14 +34,3 @@ pub async fn save_file(mut payload: Multipart) -> Result<String, Error> {
 
     Ok(filepath)
 }
-
-// pub async fn upload_handler(payload: Multipart) -> Result<HttpResponse, Error> {
-//     let filename = save_file(payload).await?;
-
-//     // upload file to GCP
-
-//     let at = storage::gcs::get_gcp_token().await;
-//     println!("{:?}", at);
-//     storage::gcs::upload_file(filename, at).await;
-//     Ok(HttpResponse::Ok().into())
-// }
