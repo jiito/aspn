@@ -10,15 +10,23 @@ diesel::table! {
 }
 
 diesel::table! {
+    functions (id) {
+        id -> Int4,
+        ref_name -> Varchar,
+        route -> Varchar,
+        project_id -> Int4,
+    }
+}
+
+diesel::table! {
     projects (id) {
         id -> Int4,
         name -> Varchar,
     }
 }
 
-diesel::joinable!(developers -> projects (project_id));
-
 diesel::allow_tables_to_appear_in_same_query!(
     developers,
+    functions,
     projects,
 );
