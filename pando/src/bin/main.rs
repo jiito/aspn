@@ -7,6 +7,8 @@ struct Args {
 }
 #[derive(Subcommand, Debug)]
 enum Commands {
+    Init {},
+    Auth {},
     Host {
         #[command(subcommand)]
         command: Option<HostCommands>,
@@ -48,6 +50,9 @@ fn main() {
                 println!("No files provided!")
             }
         },
+        Some(_) => {
+            println!("Thanks for using the ASPN cloud")
+        }
         None => {}
     }
 }
