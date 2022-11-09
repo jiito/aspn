@@ -5,7 +5,7 @@ diesel::table! {
         id -> Int4,
         name -> Varchar,
         ip_address -> Inet,
-        project_id -> Int4,
+        project_id -> Nullable<Int4>,
     }
 }
 
