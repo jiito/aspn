@@ -30,3 +30,4 @@ sanitize-filename = "0.4"
 uuid = { version = "1", features = ["v4"] }
 ipnetwork = "0.20.0"
 clap = { version = "4.0.22", features = ["derive"] }
+urlencoding = "2.1.2"

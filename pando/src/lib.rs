@@ -2,6 +2,7 @@ pub mod api;
 pub mod models;
 pub mod schema;
 pub mod storage;
+pub mod utils;
 
 #[cfg(test)]
 mod tests {
