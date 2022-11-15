@@ -50,8 +50,6 @@ pub async fn request_device_code() -> Result<DeviceCodeRes, std::io::Error> {
         .await
         .expect("Couldnt deserialize JSON");
 
-    println!("Device code response {:?}", response);
-
     Ok(response)
 }
 
@@ -87,7 +85,6 @@ pub async fn request_access_token(
     };
 
     let response = loop {
-        println!("Requesting token!");
         let response = client
             .post("https://dev-fnppi16zn0on4m4a.us.auth0.com/oauth/token")
             .headers(headers.clone())
@@ -99,7 +96,6 @@ pub async fn request_access_token(
         if response.status() == 200 {
             break response;
         } else {
-            println!("{:?}", response.text().await);
             thread::sleep(Duration::from_secs(interval));
         }
     };

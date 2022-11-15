@@ -32,7 +32,8 @@ enum DeveloperCommands {
 enum HostCommands {
     Start {},
 }
-fn main() {
+#[tokio::main]
+async fn main() {
     let cli = Args::parse();
 
     match &cli.command {
@@ -56,9 +57,7 @@ fn main() {
             utils::config::parse_config();
         }
         Some(Commands::Init {}) => commands::init(),
-        Some(_) => {
-            println!("Thanks for using the ASPN cloud")
-        }
+        Some(Commands::Auth {}) => commands::auth().await,
         None => {}
     }
 }
