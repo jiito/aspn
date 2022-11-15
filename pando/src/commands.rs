@@ -24,6 +24,9 @@ pub async fn auth() {
             utils::auth::request_access_token(device_code.device_code, device_code.interval)
                 .await
                 .expect("Could not get access token");
+        let user = utils::auth::get_user(&access_token.access_token)
+            .await
+            .expect("Could not get user");
+        println!("Successfully logged in!  Hello, {}!!", user.name)
     }
-    println!("Successfully logged in! ")
 }

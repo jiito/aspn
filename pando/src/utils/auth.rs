@@ -35,7 +35,7 @@ pub async fn request_device_code() -> Result<DeviceCodeRes, std::io::Error> {
 
     let body = DeviceCodeBody {
         client_id: "XVIVyn7Ha2hGJH423vVhjiuXRjVy6e8j",
-        scope: "profile",
+        scope: "openid profile email",
         audience: "pando.aspn.network",
     };
 
@@ -103,4 +103,57 @@ pub async fn request_access_token(
     let json_res = response.json::<AccessTokenRes>().await?;
 
     Ok(json_res)
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserResponse {
+    // pub sub: Option<String>,
+    pub name: String,
+    // #[serde(rename = "given_name")]
+    // pub given_name: String,
+    // #[serde(rename = "family_name")]
+    // pub family_name: String,
+    // #[serde(rename = "middle_name")]
+    // pub middle_name: String,
+    // pub nickname: String,
+    // #[serde(rename = "preferred_username")]
+    // pub preferred_username: String,
+    // pub profile: String,
+    // pub picture: String,
+    // pub website: String,
+    pub email: String,
+    // #[serde(rename = "email_verified")]
+    // pub email_verified: bool,
+    // pub gender: String,
+    // pub birthdate: String,
+    // pub zoneinfo: String,
+    // pub locale: String,
+    // #[serde(rename = "phone_number")]
+    // pub phone_number: String,
+    // #[serde(rename = "phone_number_verified")]
+    // pub phone_number_verified: bool,
+    // pub address: Address,
+    // #[serde(rename = "updated_at")]
+    // pub updated_at: String,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Address {
+    pub country: String,
+}
+pub async fn get_user(access_token: &str) -> Result<UserResponse, Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+
+    let response: UserResponse = client
+        .get("https://dev-fnppi16zn0on4m4a.us.auth0.com/userinfo")
+        .bearer_auth(access_token)
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    // Ok(())
+    Ok(response)
 }
