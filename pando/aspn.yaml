@@ -1,8 +1,0 @@
-project:
-  name: hello-world
-  url: https://example.com
-developer:
-  email: ben@ben.com
-service:
-  entrypoint: ./server.js
-  build: npm build

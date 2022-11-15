@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use pando::utils;
+use pando::{commands, utils};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -55,6 +55,7 @@ fn main() {
         Some(Commands::Config {}) => {
             utils::config::parse_config();
         }
+        Some(Commands::Init {}) => commands::init(),
         Some(_) => {
             println!("Thanks for using the ASPN cloud")
         }
