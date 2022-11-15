@@ -1,4 +1,5 @@
 use clap::{Parser, Subcommand};
+use pando::{commands, utils};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -8,6 +9,7 @@ struct Args {
 #[derive(Subcommand, Debug)]
 enum Commands {
     Init {},
+    Config {},
     Auth {},
     Host {
         #[command(subcommand)]
@@ -50,6 +52,10 @@ fn main() {
                 println!("No files provided!")
             }
         },
+        Some(Commands::Config {}) => {
+            utils::config::parse_config();
+        }
+        Some(Commands::Init {}) => commands::init(),
         Some(_) => {
             println!("Thanks for using the ASPN cloud")
         }
