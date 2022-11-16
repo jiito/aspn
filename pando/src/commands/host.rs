@@ -4,7 +4,7 @@ pub async fn start() {
     println!("Connecting to the ASPN cloud...");
 
     // TODO: Check authentication?
-    if !utils::config::credentials_exist() {
+    if !utils::config::host::config_exist() {
         commands::auth().await;
     }
     // Spin up microservice
