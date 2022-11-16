@@ -1,9 +1,11 @@
 use serde::{Deserialize, Serialize};
 use std::io::Write;
+
+use super::project;
 #[derive(Deserialize, Serialize, Default)]
 pub struct ConfigData {
     host: Option<HostCredentials>,
-    project: Option<ProjectData>,
+    project: Option<project::ProjectData>,
 }
 impl ConfigData {
     fn merge(self, other: ConfigData) -> Self {
@@ -18,12 +20,6 @@ impl ConfigData {
             project: new.project.or(self.project),
         }
     }
-}
-#[derive(Deserialize, Serialize)]
-pub struct ProjectData {
-    id: String,
-    name: String,
-    path: std::path::PathBuf,
 }
 #[derive(Deserialize, Serialize)]
 pub struct HostCredentials {
@@ -54,7 +50,7 @@ fn home() -> Result<std::path::PathBuf, i32> {
     home::home_dir().ok_or(0)
 }
 
-fn aspn_dir() -> String {
+pub fn aspn_dir() -> String {
     format!("{}/.aspn", home().unwrap().display())
 }
 
@@ -86,7 +82,7 @@ fn create_config_dir() {
     std::fs::create_dir_all(aspn_dir()).expect("Could not create config directory");
 }
 
-fn update_config(new_config: ConfigData) {
+pub fn update_config(new_config: ConfigData) {
     let old_config = read_config();
     let config = old_config.update(new_config);
     write_config(&config)
