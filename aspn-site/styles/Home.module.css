@@ -28,8 +28,8 @@
   flex-grow: 1;
 }
 
-.title a {
-  color: #0070f3;
+.title span {
+  color: #ffab2d;
   text-decoration: none;
 }
 
