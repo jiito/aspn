@@ -13,40 +13,27 @@ enum Commands {
     Auth {},
     Host {
         #[command(subcommand)]
-        command: Option<HostCommands>,
+        command: Option<commands::Host>,
     },
     Developer {
         #[command(subcommand)]
-        command: Option<DeveloperCommands>,
+        command: Option<commands::Developer>,
     },
 }
 
-#[derive(Subcommand, Debug)]
-enum DeveloperCommands {
-    Upload {
-        // #[arg(short, long)]
-        files: std::path::PathBuf,
-    },
-}
-#[derive(Subcommand, Debug)]
-enum HostCommands {
-    Start {},
-}
 #[tokio::main]
 async fn main() {
     let cli = Args::parse();
 
     match &cli.command {
         Some(Commands::Host { command }) => match command {
-            Some(HostCommands::Start {}) => {
-                println!("Starting the ASPN cloud")
-            }
+            Some(commands::Host::Start {}) => commands::host::start(),
             None => {
                 println!("No files provided!")
             }
         },
         Some(Commands::Developer { command }) => match command {
-            Some(DeveloperCommands::Upload { files }) => {
+            Some(commands::Developer::Upload { files }) => {
                 println!("{}", files.to_str().expect("Not a valid Path"))
             }
             None => {

@@ -1,5 +1,19 @@
+pub mod host;
 use crate::utils;
+use clap::Subcommand;
 use webbrowser;
+
+#[derive(Subcommand, Debug)]
+pub enum Host {
+    Start {},
+}
+#[derive(Subcommand, Debug)]
+pub enum Developer {
+    Upload {
+        // #[arg(short, long)]
+        files: std::path::PathBuf,
+    },
+}
 
 pub fn init() {
     let project_name = inquire::Text::new("What is the title of your project?").prompt();
@@ -27,6 +41,8 @@ pub async fn auth() {
         let user = utils::auth::get_user(&access_token.access_token)
             .await
             .expect("Could not get user");
-        println!("Successfully logged in!  Hello, {}!!", user.name)
+        println!("Successfully logged in!  Hello, {}!!", user.name);
+
+        utils::config::save_token_to_file(access_token.access_token);
     }
 }
