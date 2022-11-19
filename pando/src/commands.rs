@@ -20,8 +20,8 @@ pub fn init() {
 
     match project_name {
         Ok(name) => {
-            let config = utils::config::create_config(&name);
-            utils::config::write_default_config(&config);
+            let config = utils::config::dev::create_config(&name);
+            utils::config::dev::write_default_config(&config);
             println!("Successfully wrote config [aspn.yaml]")
         }
         Err(_) => println!("Couldn't get the project name"),
@@ -43,6 +43,6 @@ pub async fn auth() {
             .expect("Could not get user");
         println!("Successfully logged in!  Hello, {}!!", user.name);
 
-        utils::config::save_token_to_file(access_token.access_token);
+        utils::config::host::save_token_to_config(access_token.access_token);
     }
 }

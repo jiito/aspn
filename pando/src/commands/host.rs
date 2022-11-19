@@ -1,14 +1,31 @@
-use crate::{commands, utils};
+use crate::{commands, storage, utils};
 
 pub async fn start() {
     println!("Connecting to the ASPN cloud...");
 
+    let conn = &mut storage::db::establish_connection();
+
     // TODO: Check authentication?
-    if !utils::config::credentials_exist() {
+    if !utils::config::host::config_exist() {
         commands::auth().await;
     }
-    // Spin up microservice
+    let db_project = storage::db::find_project(conn, &1);
 
-    // create the ~/.aspn directory
-    std::fs::create_dir_all("~/.aspn").expect("Could not create config directory");
+    utils::config::project::save_project_connnection(db_project);
+
+    let project = utils::config::project::read_project_connection();
+
+    let project_path = match project {
+        Some(project) => project.path,
+        None => panic!("could not find a project!"),
+    };
+
+    println!("The Project Path is {}", project_path.display());
+
+    // run the project from the path
+
+    // let command = std::process::Command::new("wasmtime");
+    // Spin up microservice
+    utils::wasm::start(format!("{}main.wasm", project_path.to_str().unwrap()).as_str())
+        .expect("Could not run the program");
 }

@@ -27,7 +27,7 @@ async fn main() {
 
     match &cli.command {
         Some(Commands::Host { command }) => match command {
-            Some(commands::Host::Start {}) => commands::host::start(),
+            Some(commands::Host::Start {}) => commands::host::start().await,
             None => {
                 println!("No files provided!")
             }
@@ -41,7 +41,7 @@ async fn main() {
             }
         },
         Some(Commands::Config {}) => {
-            utils::config::parse_config();
+            utils::config::host::read_config();
         }
         Some(Commands::Init {}) => commands::init(),
         Some(Commands::Auth {}) => commands::auth().await,
