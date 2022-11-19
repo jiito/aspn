@@ -20,11 +20,12 @@ pub async fn start() {
         None => panic!("could not find a project!"),
     };
 
-    println!("The Project Path is {}", project_path.display())
+    println!("The Project Path is {}", project_path.display());
 
     // run the project from the path
 
     // let command = std::process::Command::new("wasmtime");
     // Spin up microservice
-    // utils::wasm::start(project_path.to_str().unwrap());
+    utils::wasm::start(format!("{}main.wasm", project_path.to_str().unwrap()).as_str())
+        .expect("Could not run the program");
 }
