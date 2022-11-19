@@ -4,8 +4,8 @@ use std::io::Write;
 use super::project;
 #[derive(Deserialize, Serialize, Default)]
 pub struct ConfigData {
-    host: Option<HostCredentials>,
-    project: Option<project::ProjectData>,
+    pub host: Option<HostCredentials>,
+    pub project: Option<project::ProjectData>,
 }
 impl ConfigData {
     fn merge(self, other: ConfigData) -> Self {
