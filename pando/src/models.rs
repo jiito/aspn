@@ -27,7 +27,7 @@ pub struct NewProject<'a> {
 
 #[derive(Queryable, Associations, Identifiable, Debug)]
 #[belongs_to(Project)]
-#[table_name = "developers"]
+#[diesel(table_name = developers)]
 pub struct Developer {
     pub id: i32,
     pub name: String,
@@ -40,4 +40,53 @@ pub struct Developer {
 pub struct NewDeveloper {
     pub name: String,
     pub project_id: i32,
+}
+
+#[derive(Queryable, Associations, Identifiable, Debug)]
+#[belongs_to(Project)]
+#[diesel(table_name = functions)]
+pub struct Function {
+    pub id: i32,
+    pub ref_name: String,
+    pub route: String,
+    pub project_id: i32,
+}
+#[derive(Insertable)]
+#[diesel(table_name = functions)]
+pub struct NewFunction {
+    pub ref_name: String,
+    pub route: String,
+    pub project_id: i32,
+}
+
+#[derive(Queryable, Identifiable, Debug)]
+#[diesel(table_name = hosts)]
+pub struct Host {
+    pub id: i32,
+    pub ip_address: ipnetwork::IpNetwork,
+    pub user_token: String,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = hosts)]
+pub struct NewHost {
+    pub ip_address: ipnetwork::IpNetwork,
+    pub user_token: String,
+}
+
+#[derive(Associations, Queryable, Identifiable, Debug)]
+#[diesel(table_name = hosts_functions)]
+#[belongs_to(Host)]
+#[belongs_to(Function)]
+pub struct HostsFunctions {
+    pub id: i32,
+    pub function_id: i32,
+    pub host_id: i32,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = hosts_functions)]
+pub struct NewHostFunctionIDs {
+    pub function_id: i32,
+    pub host_id: i32,
 }
