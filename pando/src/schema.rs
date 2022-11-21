@@ -12,7 +12,7 @@ diesel::table! {
 diesel::table! {
     functions (id) {
         id -> Int4,
-        ref_name -> Varchar,
+        gcs_uri -> Varchar,
         route -> Varchar,
         project_id -> Int4,
     }

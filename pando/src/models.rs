@@ -47,14 +47,14 @@ pub struct NewDeveloper {
 #[diesel(table_name = functions)]
 pub struct Function {
     pub id: i32,
-    pub ref_name: String,
+    pub gcs_uri: String,
     pub route: String,
     pub project_id: i32,
 }
 #[derive(Insertable)]
 #[diesel(table_name = functions)]
 pub struct NewFunction {
-    pub ref_name: String,
+    pub gcs_uri: String,
     pub route: String,
     pub project_id: i32,
 }
