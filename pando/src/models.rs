@@ -59,8 +59,7 @@ pub struct NewFunction {
     pub project_id: i32,
 }
 
-#[derive(Queryable, Identifiable, Debug)]
-#[diesel(table_name = hosts)]
+#[derive(Queryable, Identifiable, Debug, Serialize)]
 pub struct Host {
     pub id: i32,
     pub ip_address: ipnetwork::IpNetwork,
@@ -74,12 +73,12 @@ pub struct NewHost {
     pub user_token: String,
 }
 
-#[derive(Associations, Queryable, Identifiable, Debug)]
+#[derive(Associations, Queryable, Identifiable, Serialize, Debug)]
 #[diesel(table_name = hosts_functions)]
-#[belongs_to(Host)]
 #[belongs_to(Function)]
+#[belongs_to(Host)]
+#[primary_key(function_id, host_id)]
 pub struct HostsFunctions {
-    pub id: i32,
     pub function_id: i32,
     pub host_id: i32,
 }
