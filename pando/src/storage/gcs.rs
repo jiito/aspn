@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use chrono::Utc;
 // use rand;
 use reqwest::{
@@ -14,32 +14,32 @@ use tokio::fs::File;
 
 use ring::{rand, signature};
 
-#[derive(Debug, Deserialize)]
-struct SignedUrlResponse {
-    uri: String,
-}
-
 pub enum SignedURLRequest {
     Upload { path: String },
     Download { path: String },
 }
 
-pub async fn request_signed_url(request: SignedURLRequest) -> Result<SignedUrlResponse> {
+pub async fn request_signed_url(
+    request: SignedURLRequest,
+) -> Result<crate::api::handlers::SignedUrlResponse> {
     let client = reqwest::Client::new();
 
     let (method, path) = match request {
         SignedURLRequest::Upload { path } => ("PUT", path),
-        SignedURLRequest::Download { path } => ("GET", path),
+        SignedURLRequest::Download { path } => ("GET", urlencoding::encode(&path).to_string()),
     };
 
-    let response: SignedUrlResponse = client
-        .get("https://localhost::8080/signed_url") // TODO; move this to the API URL env var
+    println!("{} : {}", method, path);
+    let response: crate::api::handlers::SignedUrlResponse = client
+        .get("http://localhost:8080/signed_url") // TODO; move this to the API URL env var
         .query(&[("method", method), ("object_name", &path[..])])
         .send()
-        .await?
-        .json()
+        .await
+        .with_context(|| "Could not send the request")?
+        .json::<crate::api::handlers::SignedUrlResponse>()
         .await?;
 
+    println!("{:?}", response);
     Ok(response)
 }
 

@@ -3,9 +3,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Config {
-    project: ProjectConfig,
-    developer: DeveloperConfig,
-    service: ServiceConfig,
+    pub project: ProjectConfig,
+    pub developer: DeveloperConfig,
+    pub service: ServiceConfig,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -19,7 +19,7 @@ pub struct DeveloperConfig {
 }
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ServiceConfig {
-    entrypoint: String,
+    pub entrypoint: String,
     build: String,
 }
 
