@@ -10,10 +10,7 @@ pub enum Host {
 }
 #[derive(Subcommand, Debug)]
 pub enum Developer {
-    Upload {
-        // #[arg(short, long)]
-        files: std::path::PathBuf,
-    },
+    Upload {},
 }
 
 pub fn init() {

@@ -33,11 +33,12 @@ async fn main() {
             }
         },
         Some(Commands::Developer { command }) => match command {
-            Some(commands::Developer::Upload { files }) => {
-                println!("{}", files.to_str().expect("Not a valid Path"))
+            Some(commands::Developer::Upload {}) => {
+                commands::developer::upload().await;
+                println!("Phew... everything worked as promised! 🚀 ")
             }
             None => {
-                println!("No files provided!")
+                println!("No command provided!")
             }
         },
         Some(Commands::Config {}) => {
