@@ -1,3 +1,4 @@
+pub mod developer;
 pub mod host;
 use crate::utils;
 use clap::Subcommand;
@@ -21,7 +22,7 @@ pub fn init() {
     match project_name {
         Ok(name) => {
             let config = utils::config::dev::create_config(&name);
-            utils::config::dev::write_default_config(&config);
+            utils::config::dev::write(&config);
             println!("Successfully wrote config [aspn.yaml]")
         }
         Err(_) => println!("Couldn't get the project name"),
