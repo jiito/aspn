@@ -1,3 +1,4 @@
+pub mod functions;
 pub mod hosts;
 use crate::models::{Developer, NewDeveloper, NewProject, Project};
 use diesel::pg::PgConnection;
