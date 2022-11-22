@@ -4,6 +4,8 @@ use diesel::upsert::*;
 use diesel::PgConnection;
 
 use crate::models;
+use crate::storage;
+use crate::utils;
 
 pub fn save(
     conn: &mut PgConnection,
@@ -18,6 +20,16 @@ pub fn save(
     Ok(function)
 }
 
+pub fn save_w_host(
+    conn: &mut PgConnection,
+    new_function: &models::NewFunction,
+    host: &models::Host,
+) -> Result<models::Function> {
+    let function = save(conn, new_function)?;
+    storage::db::hosts::connect_host_to_function(host, &function, conn)?;
+
+    Ok(function)
+}
 pub fn find_by_id(conn: &mut PgConnection, id: &i32) -> Result<models::Function> {
     use crate::schema::functions::dsl;
 

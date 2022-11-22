@@ -1,8 +1,13 @@
 use crate::{models, storage::db::establish_connection};
+use anyhow::Result;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 
-fn connect_host_to_function(host: &models::Host, func: &models::Function, conn: &mut PgConnection) {
+pub fn connect_host_to_function(
+    host: &models::Host,
+    func: &models::Function,
+    conn: &mut PgConnection,
+) -> Result<models::HostsFunctions> {
     use crate::schema::hosts_functions;
 
     let new_host_function = models::NewHostFunctionIDs {
@@ -12,8 +17,9 @@ fn connect_host_to_function(host: &models::Host, func: &models::Function, conn: 
 
     let host_function = diesel::insert_into(hosts_functions::table)
         .values(&new_host_function)
-        .get_result::<models::HostsFunctions>(conn)
-        .expect("Error saving function");
+        .get_result::<models::HostsFunctions>(conn)?;
+
+    Ok(host_function)
 }
 
 impl models::NewHost {
