@@ -1,3 +1,4 @@
+use anyhow::Result;
 use chrono::Utc;
 // use rand;
 use reqwest::{
@@ -13,29 +14,33 @@ use tokio::fs::File;
 
 use ring::{rand, signature};
 
-pub async fn upload_file(filename: String, oauth_token: String) {
-    let object_content_type = "text/plain";
-    let bucket_name = "aspn_functions";
-
-    // open file
-    let file = File::open(filename.clone()).await.unwrap();
-    let body = Body::from(file);
-
-    let mut headers = header::HeaderMap::new();
-    headers.insert(
-        header::CONTENT_TYPE,
-        header::HeaderValue::from_str(object_content_type).unwrap(),
-    );
-
-    let uri = format!("https://storage.googleapis.com/upload/storage/v1/b/{bucket_name}/o?uploadType=media&name={filename}");
-
-    let res = request_gcp(uri, headers, body, oauth_token).await;
-
-    println!("res = {:#?}", res)
+#[derive(Debug, Deserialize)]
+struct SignedUrlResponse {
+    uri: String,
 }
 
-pub fn download_file() {
-    println!("Downloading file")
+pub enum SignedURLRequest {
+    Upload { path: String },
+    Download { path: String },
+}
+
+pub async fn request_signed_url(request: SignedURLRequest) -> Result<SignedUrlResponse> {
+    let client = reqwest::Client::new();
+
+    let (method, path) = match request {
+        SignedURLRequest::Upload { path } => ("PUT", path),
+        SignedURLRequest::Download { path } => ("GET", path),
+    };
+
+    let response: SignedUrlResponse = client
+        .get("https://localhost::8080/signed_url") // TODO; move this to the API URL env var
+        .query(&[("method", method), ("object_name", &path[..])])
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    Ok(response)
 }
 
 async fn request_gcp(
