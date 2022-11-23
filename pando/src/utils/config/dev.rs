@@ -10,8 +10,9 @@ pub struct Config {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ProjectConfig {
-    name: String,
-    url: Option<String>,
+    pub name: String,
+    pub url: Option<String>,
+    pub id: Option<i32>,
 }
 #[derive(Deserialize, Serialize, Debug)]
 pub struct DeveloperConfig {
@@ -20,6 +21,7 @@ pub struct DeveloperConfig {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ServiceConfig {
     pub entrypoint: String,
+    pub route: String,
     build: String,
 }
 
@@ -45,6 +47,7 @@ pub fn create_config(name: &str) -> Config {
         project: ProjectConfig {
             name: String::from(name),
             url: Some(String::new()),
+            id: None,
         },
         developer: DeveloperConfig {
             email: Some(String::new()),
@@ -52,6 +55,7 @@ pub fn create_config(name: &str) -> Config {
         service: ServiceConfig {
             entrypoint: String::new(),
             build: String::new(),
+            route: String::new(),
         },
     }
 }

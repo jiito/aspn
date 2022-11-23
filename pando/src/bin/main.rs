@@ -34,7 +34,7 @@ async fn main() {
         },
         Some(Commands::Developer { command }) => match command {
             Some(commands::Developer::Upload {}) => {
-                commands::developer::upload().await;
+                commands::developer::upload().await.unwrap();
                 println!("Phew... everything worked as promised! 🚀 ")
             }
             None => {

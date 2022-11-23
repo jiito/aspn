@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use diesel::prelude::*;
 use diesel::upsert::*;
 use diesel::PgConnection;
@@ -13,9 +13,13 @@ pub fn save(
 ) -> Result<models::Function> {
     use crate::schema::functions;
 
+    println!("{:?}", new_function.project_id);
+
     let function = diesel::insert_into(functions::table)
         .values(new_function)
-        .get_result::<models::Function>(conn)?;
+        .get_result::<models::Function>(conn)
+        .with_context(|| "failed to save function")?;
+    println!("Saved the func dawg");
 
     Ok(function)
 }
