@@ -1,21 +1,22 @@
 use std::{io::Error, vec};
 
-use actix_web::{web, HttpResponse};
-use serde::Deserialize;
+use actix_web::{web, HttpResponse, Responder};
+use serde::{Deserialize, Serialize};
 
 use crate::storage;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct SignedUrlQueryParams {
     method: String,
     object_name: String,
 }
 
-pub async fn signed_url_handler(
-    query_params: web::Query<SignedUrlQueryParams>,
-) -> Result<HttpResponse, Error> {
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SignedUrlResponse {
+    pub uri: String,
+}
+pub async fn signed_url_handler(query_params: web::Query<SignedUrlQueryParams>) -> impl Responder {
     // build signed url
-
     let uri = storage::gcs::generate_signed_url(
         "/Users/bjar/service-account.json".into(),
         "aspn_functions".into(),
@@ -24,8 +25,10 @@ pub async fn signed_url_handler(
         query_params.method.clone(),
         None,
     )
-    .await?;
-    Ok(HttpResponse::Ok().json(format!("{{ uri: {} }}", uri)))
+    .await
+    .unwrap();
+
+    web::Json(SignedUrlResponse { uri })
 }
 
 #[derive(Deserialize)]

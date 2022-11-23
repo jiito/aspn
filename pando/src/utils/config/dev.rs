@@ -1,16 +1,18 @@
+use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Config {
-    project: ProjectConfig,
-    developer: DeveloperConfig,
-    service: ServiceConfig,
+    pub project: ProjectConfig,
+    pub developer: DeveloperConfig,
+    pub service: ServiceConfig,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ProjectConfig {
-    name: String,
-    url: Option<String>,
+    pub name: String,
+    pub url: Option<String>,
+    pub id: Option<i32>,
 }
 #[derive(Deserialize, Serialize, Debug)]
 pub struct DeveloperConfig {
@@ -18,18 +20,18 @@ pub struct DeveloperConfig {
 }
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ServiceConfig {
-    entrypoint: String,
+    pub entrypoint: String,
+    pub route: String,
     build: String,
 }
 
-pub fn parse_config() {
-    let f = std::fs::File::open("./aspn.yaml").expect("Could not open file");
-    let scrape_config: Config = serde_yaml::from_reader(f).expect("Could not read values");
-
-    println!("{:?}", scrape_config);
+pub fn read() -> Result<Config> {
+    let f = std::fs::File::open("./aspn.yaml").with_context(|| "Could not open file")?;
+    let scrape_config: Config = serde_yaml::from_reader(f)?;
+    Ok(scrape_config)
 }
 
-pub fn write_default_config(config: &Config) {
+pub fn write(config: &Config) {
     let f = std::fs::OpenOptions::new()
         .write(true)
         .create(true)
@@ -45,6 +47,7 @@ pub fn create_config(name: &str) -> Config {
         project: ProjectConfig {
             name: String::from(name),
             url: Some(String::new()),
+            id: None,
         },
         developer: DeveloperConfig {
             email: Some(String::new()),
@@ -52,6 +55,7 @@ pub fn create_config(name: &str) -> Config {
         service: ServiceConfig {
             entrypoint: String::new(),
             build: String::new(),
+            route: String::new(),
         },
     }
 }
