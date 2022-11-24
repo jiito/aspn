@@ -23,12 +23,14 @@ impl ConfigData {
 }
 #[derive(Deserialize, Serialize)]
 pub struct HostCredentials {
-    token: String,
+    pub token: String,
 }
 
-pub fn save_token_to_config(token: String) {
+pub fn save_token_to_config(token: &str) {
     let token_config = ConfigData {
-        host: Some(HostCredentials { token }),
+        host: Some(HostCredentials {
+            token: String::from(token),
+        }),
         project: None,
     };
     update_config(token_config)

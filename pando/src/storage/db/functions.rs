@@ -30,7 +30,7 @@ pub fn save_w_host(
     host: &models::Host,
 ) -> Result<models::Function> {
     let function = save(conn, new_function)?;
-    storage::db::hosts::connect_host_to_function(host, &function, conn)?;
+    storage::db::hosts::connect_host_to_function(conn, host, &function)?;
 
     Ok(function)
 }
@@ -39,9 +39,20 @@ pub fn find_by_id(conn: &mut PgConnection, id: &i32) -> Result<models::Function>
 
     let query = dsl::functions.filter(crate::schema::functions::id.eq(id));
 
-    let developer = query.first::<models::Function>(conn)?;
+    let function = query.first::<models::Function>(conn)?;
 
-    Ok(developer)
+    Ok(function)
+}
+
+pub fn find_by_project(conn: &mut PgConnection, project_id: &i32) -> Result<models::Function> {
+    use crate::schema::functions::dsl;
+
+    let query = dsl::functions.filter(crate::schema::functions::project_id.eq(project_id));
+
+    // TODO: Eliminate first usage and return all functions
+    let functions = query.first::<models::Function>(conn)?;
+
+    Ok(functions)
 }
 
 pub fn upsert(conn: &mut PgConnection, function: &models::NewFunction) -> Result<usize> {
