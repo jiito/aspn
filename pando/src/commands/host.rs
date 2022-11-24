@@ -1,3 +1,5 @@
+use anyhow::Context;
+
 use crate::{commands, storage, utils};
 
 pub async fn start() {
@@ -11,21 +13,19 @@ pub async fn start() {
     }
     let db_project = storage::db::find_project(conn, &1);
 
-    utils::config::project::save_project_connnection(db_project);
+    utils::config::project::save_project_connnection(&db_project);
 
-    let project = utils::config::project::read_project_connection();
+    utils::api::download(&db_project.id).await.unwrap();
 
-    let project_path = match project {
-        Some(project) => project.path,
-        None => panic!("could not find a project!"),
-    };
+    let project = utils::config::project::read_project_connection()
+        .with_context(|| "No Project Config")
+        .unwrap();
 
-    println!("The Project Path is {}", project_path.display());
+    println!("The Project Path is {}", project.path.display());
 
     // run the project from the path
 
-    // let command = std::process::Command::new("wasmtime");
     // Spin up microservice
-    utils::wasm::start(format!("{}main.wasm", project_path.to_str().unwrap()).as_str())
+    utils::wasm::start(format!("{}main.wasm", project.path.to_str().unwrap()).as_str())
         .expect("Could not run the program");
 }

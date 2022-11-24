@@ -1,7 +1,12 @@
 pub mod developer;
 pub mod host;
-use crate::utils;
+use crate::{
+    models,
+    storage::{self, db::establish_connection},
+    utils,
+};
 use clap::Subcommand;
+use local_ip_address::local_ip;
 use webbrowser;
 
 #[derive(Subcommand, Debug)]
@@ -41,6 +46,13 @@ pub async fn auth() {
             .expect("Could not get user");
         println!("Successfully logged in!  Hello, {}!!", user.name);
 
-        utils::config::host::save_token_to_config(access_token.access_token);
+        // TODO: find way to branch this before the host save
+        utils::config::host::save_token_to_config(&access_token.access_token);
+        let conn = &mut establish_connection();
+        let host = models::NewHost {
+            ip_address: ipnetwork::IpNetwork::new(local_ip().unwrap(), 32).unwrap(),
+            user_token: access_token.access_token,
+        };
+        host.save(conn)
     }
 }

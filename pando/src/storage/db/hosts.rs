@@ -4,9 +4,9 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 
 pub fn connect_host_to_function(
+    conn: &mut PgConnection,
     host: &models::Host,
     func: &models::Function,
-    conn: &mut PgConnection,
 ) -> Result<models::HostsFunctions> {
     use crate::schema::hosts_functions;
 
@@ -22,8 +22,20 @@ pub fn connect_host_to_function(
     Ok(host_function)
 }
 
+pub fn find_host_by_token(conn: &mut PgConnection, token: &str) -> models::Host {
+    use crate::schema::hosts::dsl;
+
+    let query = dsl::hosts.filter(crate::schema::hosts::user_token.eq(token));
+
+    let host = query
+        .first::<models::Host>(conn)
+        .expect("Could not find host");
+
+    host
+}
+
 impl models::NewHost {
-    fn save(&self, conn: &mut PgConnection) {
+    pub fn save(&self, conn: &mut PgConnection) {
         use crate::schema::hosts;
 
         diesel::insert_into(hosts::table)
