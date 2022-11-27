@@ -80,6 +80,7 @@ pub struct Host {
     pub id: i32,
     pub ip_address: ipnetwork::IpNetwork,
     pub user_token: String,
+    pub is_online: bool,
 }
 
 #[derive(Insertable)]

@@ -1,3 +1,4 @@
+use crate::utils;
 use crate::{models, storage::db::establish_connection};
 use anyhow::Result;
 use diesel::pg::PgConnection;
@@ -32,6 +33,28 @@ pub fn find_host_by_token(conn: &mut PgConnection, token: &str) -> models::Host 
         .expect("Could not find host");
 
     host
+}
+
+pub fn find_current_host() -> Result<models::Host> {
+    let conn = &mut establish_connection();
+    let config = utils::config::host::read_config();
+    let host = find_host_by_token(conn, &config.host.unwrap().token);
+    Ok(host)
+}
+
+impl models::Host {
+    pub fn online(&self, conn: &mut PgConnection) -> Result<()> {
+        diesel::update(self)
+            .set(crate::schema::hosts::is_online.eq(true))
+            .execute(conn);
+        Ok(())
+    }
+    pub fn offline(&self, conn: &mut PgConnection) -> Result<()> {
+        diesel::update(self)
+            .set(crate::schema::hosts::is_online.eq(false))
+            .execute(conn);
+        Ok(())
+    }
 }
 
 impl models::NewHost {

@@ -21,11 +21,9 @@ pub async fn start() {
         .with_context(|| "No Project Config")
         .unwrap();
 
-    println!("The Project Path is {}", project.path.display());
-
-    // run the project from the path
-
     // Spin up microservice
     utils::wasm::start(format!("{}main.wasm", project.path.to_str().unwrap()).as_str())
         .expect("Could not run the program");
+
+    utils::auth::host::online();
 }
