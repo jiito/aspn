@@ -23,6 +23,7 @@ diesel::table! {
         id -> Int4,
         ip_address -> Inet,
         user_token -> Varchar,
+        is_online -> Bool,
     }
 }
 

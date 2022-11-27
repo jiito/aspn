@@ -31,11 +31,7 @@ impl Project {
     }
 
     pub fn connect(&self) -> Result<()> {
-        utils::config::project::save_project_connnection(self)?;
-
-        // mark as connected in the database
-
-        Ok(())
+        utils::config::project::save_project_connnection(self)
     }
 }
 
