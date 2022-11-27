@@ -55,4 +55,6 @@ pub async fn auth() {
         };
         host.save(conn)
     }
+
+    // Connect to a project
 }

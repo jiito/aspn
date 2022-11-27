@@ -1,4 +1,5 @@
 use crate::{schema::*, utils};
+use anyhow::Result;
 use diesel::prelude::*;
 use serde::Serialize;
 use std::{
@@ -11,6 +12,7 @@ pub struct Project {
     pub id: i32,
     pub name: String,
 }
+
 impl Project {
     pub fn calculate_hash(&self) -> String {
         let mut s = DefaultHasher::new();
@@ -26,6 +28,10 @@ impl Project {
         // make sure the dir exists
         std::fs::create_dir_all(&path).unwrap();
         path
+    }
+
+    pub fn connect(&self) -> Result<()> {
+        utils::config::project::save_project_connnection(self)
     }
 }
 
@@ -74,6 +80,7 @@ pub struct Host {
     pub id: i32,
     pub ip_address: ipnetwork::IpNetwork,
     pub user_token: String,
+    pub is_online: bool,
 }
 
 #[derive(Insertable)]
