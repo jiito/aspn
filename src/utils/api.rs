@@ -1,0 +1,120 @@
+pub mod storage;
+use anyhow::{Context, Result};
+use serde::{Deserialize, Serialize};
+use std::{fs::File as StdFile, io::Cursor};
+use tokio::fs::File;
+
+use crate::{config, utils};
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SignedUrlResponse {
+    pub uri: String,
+}
+pub async fn upload() -> Result<()> {
+    let config = config::dev::read()?;
+
+    let project_id = config
+        .project
+        .id
+        .expect("Must have a project id in aspn.yaml. Please authenticate");
+
+    let entrypoint = config.service.entrypoint;
+
+    let signed_url_res: SignedUrlResponse =
+        gcs::request_signed_url(gcs::SignedURLRequest::Upload {
+            path: entrypoint.clone(),
+        })
+        .await?;
+
+    let file = File::open(&entrypoint).await?;
+
+    let file_body = reqwest::Body::from(file);
+
+    let client = reqwest::Client::new();
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.append(
+        reqwest::header::CONTENT_TYPE,
+        reqwest::header::HeaderValue::from_str("text/plain")?,
+    );
+
+    let res = client
+        .put(signed_url_res.uri)
+        .body(file_body)
+        .headers(headers)
+        .send()
+        .await
+        .context("Could not upload the file")?;
+
+    // save the file to a funciton record with the GCS link
+
+    todo!("Fill in the save function");
+    storage::function::save();
+
+    Ok(())
+}
+
+pub async fn download(project_id: &i32) -> Result<()> {
+    let project = storage::project::find();
+    let config = config::host::read_config();
+
+    //find the functions related to the project
+    let function = storage::function::find_by_project(project_id)?;
+
+    // download the function
+
+    let signed_url_res: SignedUrlResponse =
+        gcs::request_signed_url(gcs::SignedURLRequest::Download { path: todo!() })
+            .await
+            .with_context(|| "Could not get signed url for downloading { (function.gcs_uri) }")?;
+
+    // Create the file in the config dirtectory
+    let project_dir = todo!();
+    let mut dest = StdFile::create(format!("{}main.wasm", todo!()))?;
+
+    // TODO: abstract this above with interatcing with the signed urls
+    let client = reqwest::Client::new();
+
+    let response = client.get(signed_url_res.uri).send().await?;
+
+    let mut content = Cursor::new(response.bytes().await?);
+
+    std::io::copy(&mut content, &mut dest)?;
+
+    // connect the host to the fucntion
+    let host = storage::host::find_by_token(&config.host.unwrap().token);
+    let host_function = storage::host::save_function_connection(todo!(), todo!());
+
+    Ok(())
+}
+
+mod gcs {
+    use super::SignedUrlResponse;
+    use anyhow::{Context, Result};
+
+    pub enum SignedURLRequest {
+        Upload { path: String },
+        Download { path: String },
+    }
+
+    pub async fn request_signed_url(request: SignedURLRequest) -> Result<SignedUrlResponse> {
+        let client = reqwest::Client::new();
+
+        let (method, path) = match request {
+            SignedURLRequest::Upload { path } => ("PUT", path),
+            SignedURLRequest::Download { path } => ("GET", urlencoding::encode(&path).to_string()),
+        };
+
+        println!("{} : {}", method, path);
+        let response: SignedUrlResponse = client
+            .get("http://localhost:8080/signed_url") // TODO; move this to the API URL env var
+            .query(&[("method", method), ("object_name", &path[..])])
+            .send()
+            .await
+            .with_context(|| "Could not send the request")?
+            .json::<SignedUrlResponse>()
+            .await?;
+
+        println!("{:?}", response);
+        Ok(response)
+    }
+}
