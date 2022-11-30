@@ -14,6 +14,10 @@ async fn main() -> std::io::Result<()> {
                 "/project",
                 web::post().to(pando::api::handlers::create_project),
             )
+            .route(
+                "/auth",
+                web::post().to(pando::api::handlers::create_project),
+            )
     })
     .bind(("127.0.0.1", 8080))?
     .run()

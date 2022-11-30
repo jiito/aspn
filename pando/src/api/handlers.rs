@@ -1,9 +1,10 @@
 use std::{io::Error, vec};
 
 use actix_web::{web, HttpResponse, Responder};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
-use crate::storage;
+use crate::{storage, utils};
 
 #[derive(Deserialize, Debug)]
 pub struct SignedUrlQueryParams {
@@ -51,4 +52,13 @@ pub async fn create_project(data: web::Json<CreateProjectData>) -> Result<HttpRe
 
     // Ok(HttpResponse::Ok().json(format!("{{ project: {} }}", project)))
     Ok(HttpResponse::Ok().json(format!("{{ project: {} }}", "{}")))
+}
+
+#[derive(Deserialize)]
+pub struct ConnectHostData {
+    host_id: i32,
+    project_id: i32,
+}
+pub async fn connect_host(data: web::Json<ConnectHostData>) -> Result<HttpResponse> {
+    Ok(todo!())
 }
