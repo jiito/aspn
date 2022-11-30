@@ -16,11 +16,13 @@ pub mod function {
 pub mod project {
     use anyhow::Result;
 
+    use crate::utils::api::models;
+
     pub fn save() -> Result<()> {
         Ok(())
     }
-    pub fn find() -> Result<()> {
-        Ok(())
+    pub fn find() -> Result<models::Project> {
+        todo!("Get the Project from the API")
     }
 }
 pub mod host {
