@@ -4,7 +4,7 @@ use std::{
 };
 
 use anyhow::Result;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::config;
 
@@ -34,4 +34,63 @@ impl Project {
     pub fn connect(&self) -> Result<()> {
         config::project::save_project_connnection(self)
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewProject<'a> {
+    pub name: &'a str,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Developer {
+    pub id: i32,
+    pub name: String,
+    pub ip_address: ipnetwork::IpNetwork,
+    pub project_id: Option<i32>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewDeveloper {
+    pub name: String,
+    pub project_id: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Function {
+    pub id: i32,
+    pub gcs_uri: String,
+    pub route: String,
+    pub project_id: i32,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewFunction {
+    pub gcs_uri: String,
+    pub route: String,
+    pub project_id: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Host {
+    pub id: i32,
+    pub ip_address: ipnetwork::IpNetwork,
+    pub user_token: String,
+    pub is_online: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewHost {
+    pub ip_address: ipnetwork::IpNetwork,
+    pub user_token: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HostsFunctions {
+    pub function_id: i32,
+    pub host_id: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct NewHostFunctionIDs {
+    pub function_id: i32,
+    pub host_id: i32,
 }
