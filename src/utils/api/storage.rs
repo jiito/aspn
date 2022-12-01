@@ -69,24 +69,21 @@ pub mod host {
         res
     }
 
+    pub async fn current_host() -> Result<models::Host> {
+        let config = config::host::read_config();
+        find_by_token(&config.host.unwrap().token).await
+    }
+
     pub async fn online() -> Result<()> {
         // used for marking a host online
         let host = current_host().await?;
         let path = format!("/host/{}/connect", host.id);
-        let res = api::request(http::Method::POST, &path[..], &Some("{}")).await;
-        res
+        api::request(http::Method::POST, &path[..], &Some("{}")).await
     }
-    pub async fn current_host() -> Result<models::Host> {
-        let config = config::host::read_config();
-        let host = find_by_token(&config.host.unwrap().token).await?;
-        Ok(host)
-    }
-
     pub async fn offline() -> Result<()> {
         // to be called when a host kills their program
         let host = current_host().await?;
         let path = format!("/host/{}/disconnect", host.id);
-        let res = api::request(http::Method::POST, &path[..], &Some("{}")).await;
-        res
+        api::request(http::Method::POST, &path[..], &Some("{}")).await
     }
 }
