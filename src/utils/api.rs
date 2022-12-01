@@ -8,7 +8,6 @@ use tokio::fs::File;
 
 use crate::config;
 
-enum RequestMethod {}
 pub async fn request<T: Serialize, U>(method: Method, route: &str, data: &Option<T>) -> Result<U>
 where
     U: for<'de> Deserialize<'de>,
