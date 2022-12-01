@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::config;
 
-#[derive(Debug, Serialize, Hash)]
+#[derive(Debug, Deserialize, Serialize, Hash)]
 pub struct Project {
     pub id: i32,
     pub name: String,

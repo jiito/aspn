@@ -24,22 +24,26 @@ pub mod function {
 }
 
 pub mod project {
+    use actix_web::http;
     use anyhow::Result;
 
-    use crate::utils::api::models;
+    use crate::utils::api::{self, models};
 
     pub fn save() -> Result<()> {
         Ok(())
     }
-    pub fn find(id: &i32) -> Result<models::Project> {
-        todo!("Get the Project from the API")
+    pub async fn find(id: &i32) -> Result<models::Project> {
+        let path = format!("/project/{id}");
+        let res = api::request(http::Method::GET, &path[..], &Some("{}")).await;
+        res
     }
 }
 
 pub mod host {
-    use anyhow::Result;
+    use anyhow::{Context, Result};
 
     use actix_web::http;
+    use serde::Deserialize;
 
     use crate::{
         config,
@@ -63,7 +67,7 @@ pub mod host {
     }
 
     pub async fn save_function_connection(function_id: &i32) -> Result<models::HostsFunctions> {
-        let host = current_host().await?;
+        let host = current_host().await.context("Getting the host")?;
         let path = format!("/host/{}/{}/connect", host.id, function_id);
         let res = api::request(http::Method::POST, &path[..], &Some("{}")).await;
         res
@@ -74,13 +78,17 @@ pub mod host {
         find_by_token(&config.host.unwrap().token).await
     }
 
-    pub async fn online() -> Result<()> {
+    #[derive(Deserialize)]
+    pub struct ConnectionResponse {
+        is_online: bool,
+    }
+    pub async fn online() -> Result<ConnectionResponse> {
         // used for marking a host online
         let host = current_host().await?;
         let path = format!("/host/{}/connect", host.id);
         api::request(http::Method::POST, &path[..], &Some("{}")).await
     }
-    pub async fn offline() -> Result<()> {
+    pub async fn offline() -> Result<ConnectionResponse> {
         // to be called when a host kills their program
         let host = current_host().await?;
         let path = format!("/host/{}/disconnect", host.id);

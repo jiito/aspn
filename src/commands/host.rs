@@ -12,19 +12,20 @@ pub async fn start() {
     if !config::host::config_exist() {
         commands::auth().await;
     }
-    let db_project = api::storage::project::find(&1).unwrap();
+    let db_project = api::storage::project::find(&1).await.unwrap();
 
-    config::project::save_project_connnection(&db_project);
+    config::project::save_project_connnection(&db_project).unwrap();
 
     utils::api::download(&db_project.id).await.unwrap();
+    println!("Succesfully downloaded file...");
 
     let project = config::project::read_project_connection()
         .with_context(|| "No Project Config")
         .unwrap();
 
-    api::storage::host::online();
+    api::storage::host::online().await.unwrap();
     // Spin up microservice
-    todo!("Use the dockerfile over wasm ");
-    utils::wasm::start(format!("{}main.wasm", project.path.to_str().unwrap()).as_str())
-        .expect("Could not run the program");
+    // todo!("Use the dockerfile over wasm ");
+    // utils::wasm::start(format!("{}main.wasm", project.path.to_str().unwrap()).as_str())
+    //     .expect("Could not run the program");
 }

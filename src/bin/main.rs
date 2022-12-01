@@ -1,3 +1,4 @@
+use aspn::{commands, config};
 use clap::{Parser, Subcommand};
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -41,7 +42,7 @@ async fn main() {
             }
         },
         Some(Commands::Config {}) => {
-            utils::config::host::read_config();
+            config::host::read_config();
         }
         Some(Commands::Init {}) => commands::init(),
         Some(Commands::Auth {}) => commands::auth().await,

@@ -12,6 +12,7 @@ pub async fn request<T: Serialize, U>(method: Method, route: &str, data: &Option
 where
     U: for<'de> Deserialize<'de>,
 {
+    println!("[API] {} | {}", method.as_str(), route);
     let client = reqwest::Client::new();
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(
@@ -89,11 +90,12 @@ pub async fn upload() -> Result<()> {
 }
 
 pub async fn download(project_id: &i32) -> Result<()> {
-    let project = storage::project::find()?;
+    let project = storage::project::find(project_id).await?;
 
     //find the functions related to the project
     let function = storage::function::find_by_project(project_id).await?;
 
+    println!("The Function is : {:?}", function);
     // download the function
 
     let signed_url_res: SignedUrlResponse =
@@ -110,14 +112,20 @@ pub async fn download(project_id: &i32) -> Result<()> {
     // TODO: abstract this above with interatcing with the signed urls
     let client = reqwest::Client::new();
 
-    let response = client.get(signed_url_res.uri).send().await?;
+    let response = client
+        .get(signed_url_res.uri)
+        .send()
+        .await
+        .context("Downloading file")?;
 
-    let mut content = Cursor::new(response.bytes().await?);
+    let mut content = Cursor::new(response.bytes().await.context("Setting cursor")?);
 
-    std::io::copy(&mut content, &mut dest)?;
+    std::io::copy(&mut content, &mut dest).context("Copying file to dest")?;
 
     // connect the host to the fucntion
-    storage::host::save_function_connection(&function.id).await?;
+    storage::host::save_function_connection(&function.id)
+        .await
+        .context("Saving function connection")?;
 
     Ok(())
 }
