@@ -92,7 +92,3 @@ pub fn update_config(new_config: ConfigData) {
     let config = old_config.update(new_config);
     write_config(&config)
 }
-
-pub fn find_current_host() -> Result<models::Host> {
-    todo!("Implement find currrent host using pando api")
-}

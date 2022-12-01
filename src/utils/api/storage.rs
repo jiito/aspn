@@ -41,7 +41,24 @@ pub mod host {
     pub fn find_by_token(token: &str) -> Result<models::Host> {
         todo!("Add find by token for <Host>")
     }
+
+    // TODO: Move to config!!
     pub fn save_function_connection(host_id: &i32, function_id: &i32) -> Result<()> {
         Ok(())
+    }
+
+    pub fn online() -> Result<()> {
+        // used for marking a host online
+        let host = current_host()?;
+        todo!("Implement online/offline wrappers")
+    }
+    pub fn current_host() -> Result<models::Host> {
+        todo!("Implement find currrent host using pando api")
+    }
+
+    pub fn offline() -> Result<()> {
+        // to be called when a host kills their program
+        let host = current_host()?;
+        todo!("Implement online/offline wrappers")
     }
 }
