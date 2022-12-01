@@ -31,7 +31,7 @@ pub mod project {
     pub fn save() -> Result<()> {
         Ok(())
     }
-    pub fn find() -> Result<models::Project> {
+    pub fn find(id: &i32) -> Result<models::Project> {
         todo!("Get the Project from the API")
     }
 }

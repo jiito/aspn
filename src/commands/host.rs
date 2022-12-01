@@ -1,30 +1,30 @@
 use anyhow::Context;
 
-use crate::{commands, utils};
+use crate::{
+    commands, config,
+    utils::{self, api},
+};
 
 pub async fn start() {
     println!("Connecting to the ASPN cloud...");
 
-    todo!()
-    // let conn = &mut storage::db::establish_connection();
+    // TODO: Check authentication?
+    if !config::host::config_exist() {
+        commands::auth().await;
+    }
+    let db_project = api::storage::project::find(&1).unwrap();
 
-    // // TODO: Check authentication?
-    // if !utils::config::host::config_exist() {
-    //     commands::auth().await;
-    // }
-    // let db_project = storage::db::find_project(conn, &1);
+    config::project::save_project_connnection(&db_project);
 
-    // utils::config::project::save_project_connnection(&db_project);
+    utils::api::download(&db_project.id).await.unwrap();
 
-    // utils::api::download(&db_project.id).await.unwrap();
+    let project = config::project::read_project_connection()
+        .with_context(|| "No Project Config")
+        .unwrap();
 
-    // let project = utils::config::project::read_project_connection()
-    //     .with_context(|| "No Project Config")
-    //     .unwrap();
-
-    // // Spin up microservice
-    // utils::wasm::start(format!("{}main.wasm", project.path.to_str().unwrap()).as_str())
-    //     .expect("Could not run the program");
-
-    // utils::auth::host::online();
+    api::storage::host::online();
+    // Spin up microservice
+    todo!("Use the dockerfile over wasm ");
+    utils::wasm::start(format!("{}main.wasm", project.path.to_str().unwrap()).as_str())
+        .expect("Could not run the program");
 }
