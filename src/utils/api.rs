@@ -112,8 +112,7 @@ pub async fn download(project_id: &i32) -> Result<()> {
     std::io::copy(&mut content, &mut dest)?;
 
     // connect the host to the fucntion
-    let host = storage::host::find_by_token(&config.host.unwrap().token);
-    let host_function = storage::host::save_function_connection(todo!(), todo!());
+    let host_function = storage::host::save_function_connection(&function.id);
 
     Ok(())
 }

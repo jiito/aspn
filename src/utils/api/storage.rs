@@ -39,35 +39,54 @@ pub mod project {
 pub mod host {
     use anyhow::Result;
 
-    use crate::utils::api::models;
+    use actix_web::http;
 
-    pub fn save(new_host: models::NewHost) -> Result<()> {
-        Ok(())
+    use crate::{
+        config,
+        utils::api::{self, models},
+    };
+
+    pub async fn save(new_host: models::NewHost) -> Result<()> {
+        let path = format!("/host");
+        let res = api::request(http::Method::POST, &path[..], &Some(new_host)).await;
+        res
     }
-    pub fn find(id: &i32) -> Result<models::Host> {
-        todo!("Add find for <Host>")
+    pub async fn find(id: &i32) -> Result<models::Host> {
+        let path = format!("/host/{id}");
+        let res = api::request(http::Method::GET, &path[..], &Some("{}")).await;
+        res
     }
-    pub fn find_by_token(token: &str) -> Result<models::Host> {
-        todo!("Add find by token for <Host>")
+    pub async fn find_by_token(token: &str) -> Result<models::Host> {
+        let path = format!("/host?token={token}");
+        let res = api::request(http::Method::GET, &path[..], &Some("{}")).await;
+        res
     }
 
-    // TODO: Move to config!!
-    pub fn save_function_connection(host_id: &i32, function_id: &i32) -> Result<()> {
-        Ok(())
+    pub async fn save_function_connection(function_id: &i32) -> Result<models::HostsFunctions> {
+        let host = current_host().await?;
+        let path = format!("/host/{}/{}/connect", host.id, function_id);
+        let res = api::request(http::Method::POST, &path[..], &Some("{}")).await;
+        res
     }
 
-    pub fn online() -> Result<()> {
+    pub async fn online() -> Result<()> {
         // used for marking a host online
-        let host = current_host()?;
-        todo!("Implement online/offline wrappers")
+        let host = current_host().await?;
+        let path = format!("/host/{}/connect", host.id);
+        let res = api::request(http::Method::POST, &path[..], &Some("{}")).await;
+        res
     }
-    pub fn current_host() -> Result<models::Host> {
-        todo!("Implement find currrent host using pando api")
+    pub async fn current_host() -> Result<models::Host> {
+        let config = config::host::read_config();
+        let host = find_by_token(&config.host.unwrap().token).await?;
+        Ok(host)
     }
 
-    pub fn offline() -> Result<()> {
+    pub async fn offline() -> Result<()> {
         // to be called when a host kills their program
-        let host = current_host()?;
-        todo!("Implement online/offline wrappers")
+        let host = current_host().await?;
+        let path = format!("/host/{}/disconnect", host.id);
+        let res = api::request(http::Method::POST, &path[..], &Some("{}")).await;
+        res
     }
 }
