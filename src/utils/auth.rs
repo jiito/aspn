@@ -1,6 +1,5 @@
 use std::{thread, time::Duration};
 
-use actix_web::HttpResponse;
 use reqwest::{
     header::{self, HeaderMap},
     Body,
