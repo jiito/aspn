@@ -89,7 +89,7 @@ pub async fn download(project_id: &i32) -> Result<()> {
     let config = config::host::read_config();
 
     //find the functions related to the project
-    let function = storage::function::find_by_project(project_id)?;
+    let function = storage::function::find_by_project(project_id).await?;
 
     // download the function
 

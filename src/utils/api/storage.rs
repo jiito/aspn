@@ -6,16 +6,20 @@ pub mod function {
 
     use crate::utils::api::{self, models};
 
-    pub fn save(new_function: models::NewFunction) -> Result<()> {
-        Ok(())
+    pub async fn save(new_function: &models::NewFunction) -> Result<models::Function> {
+        let path = format!("/function");
+        let res = api::request(http::Method::POST, &path[..], &Some(new_function)).await;
+        res
     }
     pub async fn find(id: &i32) -> Result<models::Function> {
         let path = format!("/function/{id}");
         let res = api::request(http::Method::GET, &path[..], &Some("{}")).await;
         res
     }
-    pub fn find_by_project(project_id: &i32) -> Result<models::Function> {
-        todo!("Add find by project for funcitons")
+    pub async fn find_by_project(project_id: &i32) -> Result<models::Function> {
+        let path = format!("/function?project_id={project_id}");
+        let res = api::request(http::Method::GET, &path[..], &Some("{}")).await;
+        res
     }
 }
 
