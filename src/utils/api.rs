@@ -68,7 +68,7 @@ pub async fn upload() -> Result<()> {
         reqwest::header::HeaderValue::from_str("text/plain")?,
     );
 
-    let res = client
+    client
         .put(signed_url_res.uri)
         .body(file_body)
         .headers(headers)
@@ -78,15 +78,18 @@ pub async fn upload() -> Result<()> {
 
     // save the file to a funciton record with the GCS link
 
-    todo!("Fill in the save function");
-    // storage::function::save();
+    let func = models::NewFunction {
+        project_id,
+        gcs_uri: entrypoint,
+        route: config.service.route,
+    };
+    storage::function::save(&func).await?;
 
     Ok(())
 }
 
 pub async fn download(project_id: &i32) -> Result<()> {
-    let project = storage::project::find();
-    let config = config::host::read_config();
+    let project = storage::project::find()?;
 
     //find the functions related to the project
     let function = storage::function::find_by_project(project_id).await?;
@@ -94,13 +97,15 @@ pub async fn download(project_id: &i32) -> Result<()> {
     // download the function
 
     let signed_url_res: SignedUrlResponse =
-        gcs::request_signed_url(gcs::SignedURLRequest::Download { path: todo!() })
-            .await
-            .with_context(|| "Could not get signed url for downloading { (function.gcs_uri) }")?;
+        gcs::request_signed_url(gcs::SignedURLRequest::Download {
+            path: function.gcs_uri,
+        })
+        .await
+        .with_context(|| "Could not get signed url for downloading { (function.gcs_uri) }")?;
 
     // Create the file in the config dirtectory
-    let project_dir = todo!();
-    let mut dest = StdFile::create(format!("{}main.wasm", todo!()))?;
+    let project_dir = project.host_dir();
+    let mut dest = StdFile::create(format!("{}Dockerfile", project_dir.display()))?;
 
     // TODO: abstract this above with interatcing with the signed urls
     let client = reqwest::Client::new();
@@ -112,7 +117,7 @@ pub async fn download(project_id: &i32) -> Result<()> {
     std::io::copy(&mut content, &mut dest)?;
 
     // connect the host to the fucntion
-    let host_function = storage::host::save_function_connection(&function.id);
+    storage::host::save_function_connection(&function.id).await?;
 
     Ok(())
 }
