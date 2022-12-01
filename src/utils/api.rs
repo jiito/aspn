@@ -1,16 +1,47 @@
 pub mod models;
 pub mod storage;
 use anyhow::{Context, Result};
+use reqwest::{Body, Method};
 use serde::{Deserialize, Serialize};
 use std::{fs::File as StdFile, io::Cursor};
 use tokio::fs::File;
 
 use crate::config;
 
+pub async fn request<T: Serialize, U>(method: Method, route: &str, data: &Option<T>) -> Result<U>
+where
+    U: for<'de> Deserialize<'de>,
+{
+    println!("[API] {} | {}", method.as_str(), route);
+    let client = reqwest::Client::new();
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.append(
+        reqwest::header::CONTENT_TYPE,
+        reqwest::header::HeaderValue::from_str("application/json")?,
+    );
+
+    let body = Body::from(serde_json::to_string(data)?);
+
+    let uri = format!("http://localhost:8080{}", route);
+
+    let res: U = client
+        .request(method, uri)
+        .body(body)
+        .headers(headers)
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    Ok(res)
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SignedUrlResponse {
     pub uri: String,
 }
+
+// TODO: Move these handlers to their own module
 pub async fn upload() -> Result<()> {
     let config = config::dev::read()?;
 
@@ -38,7 +69,7 @@ pub async fn upload() -> Result<()> {
         reqwest::header::HeaderValue::from_str("text/plain")?,
     );
 
-    let res = client
+    client
         .put(signed_url_res.uri)
         .body(file_body)
         .headers(headers)
@@ -48,42 +79,53 @@ pub async fn upload() -> Result<()> {
 
     // save the file to a funciton record with the GCS link
 
-    todo!("Fill in the save function");
-    storage::function::save();
+    let func = models::NewFunction {
+        project_id,
+        gcs_uri: entrypoint,
+        route: config.service.route,
+    };
+    storage::function::save(&func).await?;
 
     Ok(())
 }
 
 pub async fn download(project_id: &i32) -> Result<()> {
-    let project = storage::project::find();
-    let config = config::host::read_config();
+    let project = storage::project::find(project_id).await?;
 
     //find the functions related to the project
-    let function = storage::function::find_by_project(project_id)?;
+    let function = storage::function::find_by_project(project_id).await?;
 
+    println!("The Function is : {:?}", function);
     // download the function
 
     let signed_url_res: SignedUrlResponse =
-        gcs::request_signed_url(gcs::SignedURLRequest::Download { path: todo!() })
-            .await
-            .with_context(|| "Could not get signed url for downloading { (function.gcs_uri) }")?;
+        gcs::request_signed_url(gcs::SignedURLRequest::Download {
+            path: function.gcs_uri,
+        })
+        .await
+        .with_context(|| "Could not get signed url for downloading { (function.gcs_uri) }")?;
 
     // Create the file in the config dirtectory
-    let project_dir = todo!();
-    let mut dest = StdFile::create(format!("{}main.wasm", todo!()))?;
+    let project_dir = project.host_dir();
+    let mut dest = StdFile::create(format!("{}Dockerfile", project_dir.display()))?;
 
     // TODO: abstract this above with interatcing with the signed urls
     let client = reqwest::Client::new();
 
-    let response = client.get(signed_url_res.uri).send().await?;
+    let response = client
+        .get(signed_url_res.uri)
+        .send()
+        .await
+        .context("Downloading file")?;
 
-    let mut content = Cursor::new(response.bytes().await?);
+    let mut content = Cursor::new(response.bytes().await.context("Setting cursor")?);
 
-    std::io::copy(&mut content, &mut dest)?;
+    std::io::copy(&mut content, &mut dest).context("Copying file to dest")?;
 
     // connect the host to the fucntion
-    let host = storage::host::find_by_token(&config.host.unwrap().token);
-    let host_function = storage::host::save_function_connection(todo!(), todo!());
+    storage::host::save_function_connection(&function.id)
+        .await
+        .context("Saving function connection")?;
 
     Ok(())
 }

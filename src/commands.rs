@@ -1,9 +1,11 @@
 pub mod developer;
 pub mod host;
 use crate::{
-    models,
-    storage::{self, db::establish_connection},
-    utils,
+    config,
+    utils::{
+        self,
+        api::{self, models},
+    },
 };
 use clap::Subcommand;
 use local_ip_address::local_ip;
@@ -23,8 +25,8 @@ pub fn init() {
 
     match project_name {
         Ok(name) => {
-            let config = utils::config::dev::create_config(&name);
-            utils::config::dev::write(&config);
+            let config = config::dev::create_config(&name);
+            config::dev::write(&config);
             println!("Successfully wrote config [aspn.yaml]")
         }
         Err(_) => println!("Couldn't get the project name"),
@@ -47,14 +49,11 @@ pub async fn auth() {
         println!("Successfully logged in!  Hello, {}!!", user.name);
 
         // TODO: find way to branch this before the host save
-        utils::config::host::save_token_to_config(&access_token.access_token);
-        let conn = &mut establish_connection();
+        config::host::save_token_to_config(&access_token.access_token);
         let host = models::NewHost {
             ip_address: ipnetwork::IpNetwork::new(local_ip().unwrap(), 32).unwrap(),
             user_token: access_token.access_token,
         };
-        host.save(conn)
+        api::storage::host::save(host).await;
     }
-
-    // Connect to a project
 }
