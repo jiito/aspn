@@ -1,5 +1,14 @@
 // These methods will be used to call the Pando CRUD api endpoints
 
+pub mod developer {
+    use crate::config;
+
+    pub async fn current() {
+        let config = config::host::read_config();
+    }
+    pub async fn save() {}
+    pub async fn find_by_token(token: &str) {}
+}
 pub mod function {
     use anyhow::Result;
     use reqwest::Method;
@@ -26,11 +35,24 @@ pub mod function {
 pub mod project {
     use anyhow::Result;
     use reqwest::Method;
+    use serde::Serialize;
 
     use crate::utils::api::{self, models};
 
-    pub fn save() -> Result<()> {
-        Ok(())
+    #[derive(Serialize)]
+    pub struct CreateProjectData<'a> {
+        name: &'a str,
+        developer_id: &'a i32,
+    }
+    pub async fn save(name: &str, developer_id: &i32) -> Result<models::Project> {
+        let path = format!("/project");
+        let res = api::request(
+            Method::GET,
+            &path[..],
+            &Some(CreateProjectData { name, developer_id }),
+        )
+        .await;
+        res
     }
     pub async fn find(id: &i32) -> Result<models::Project> {
         let path = format!("/project/{id}");
