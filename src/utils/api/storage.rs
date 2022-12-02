@@ -1,13 +1,29 @@
 // These methods will be used to call the Pando CRUD api endpoints
 
 pub mod developer {
-    use crate::config;
+    use anyhow::{anyhow, Context, Result};
+    use reqwest::Method;
 
-    pub async fn current() {
+    use crate::{
+        config,
+        utils::api::{self, models},
+    };
+
+    pub async fn current() -> Result<models::Developer> {
         let config = config::host::read_config();
+        let user = config.host.context("Must authenticate first")?;
+        find_by_token(&user.token).await
     }
-    pub async fn save() {}
-    pub async fn find_by_token(token: &str) {}
+    pub async fn save(dev: &models::NewDeveloper) -> Result<models::Developer> {
+        let path = format!("/developer");
+        let res = api::request(Method::POST, &path[..], &Some(dev)).await;
+        res
+    }
+    pub async fn find_by_token(token: &str) -> Result<models::Developer> {
+        let path = format!("/developer?token={token}");
+        let res = api::request(Method::GET, &path[..], &Some("{}")).await;
+        res
+    }
 }
 pub mod function {
     use anyhow::Result;
