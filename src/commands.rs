@@ -15,10 +15,12 @@ use webbrowser;
 #[derive(Subcommand, Debug)]
 pub enum Host {
     Start {},
+    Auth {},
 }
 #[derive(Subcommand, Debug)]
 pub enum Developer {
     Upload {},
+    Auth {},
 }
 
 pub async fn init() -> Result<()> {
@@ -39,7 +41,12 @@ pub async fn init() -> Result<()> {
     Ok(())
 }
 
-pub async fn auth() -> Result<()> {
+pub enum UserType {
+    Dev,
+    Host,
+}
+
+pub async fn auth(user_type: UserType) -> Result<()> {
     let device_code = utils::auth::request_device_code()
         .await
         .expect("Could not get device code");
@@ -55,21 +62,28 @@ pub async fn auth() -> Result<()> {
 
         // TODO: find way to branch this before the host save
         config::host::save_token_to_config(&access_token.access_token);
-        let project_id = config::dev::read()?
-            .project
-            .id
-            .expect("Must set project ID in config.yaml");
-        let dev = models::NewDeveloper {
-            name: user.name,
-            project_id,
-            auth_token: Some(access_token.access_token.clone()),
-        };
-        let host = models::NewHost {
-            ip_address: ipnetwork::IpNetwork::new(local_ip()?, 32)?,
-            user_token: access_token.access_token,
-        };
-        api::storage::developer::save(&dev).await?;
-        api::storage::host::save(host).await?;
+
+        match user_type {
+            UserType::Dev => {
+                let project_id = config::dev::read()?
+                    .project
+                    .id
+                    .expect("Must set project ID in config.yaml");
+                let dev = models::NewDeveloper {
+                    name: user.name,
+                    project_id,
+                    auth_token: Some(access_token.access_token.clone()),
+                };
+                api::storage::developer::save(&dev).await?;
+            }
+            UserType::Host => {
+                let host = models::NewHost {
+                    ip_address: ipnetwork::IpNetwork::new(local_ip()?, 32)?,
+                    user_token: access_token.access_token,
+                };
+                api::storage::host::save(host).await?;
+            }
+        }
     };
     Ok(())
 }

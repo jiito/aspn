@@ -11,7 +11,6 @@ struct Args {
 enum Commands {
     Init {},
     Config {},
-    Auth {},
     Host {
         #[command(subcommand)]
         command: Option<commands::Host>,
@@ -29,6 +28,7 @@ async fn main() -> Result<()> {
     match &cli.command {
         Some(Commands::Host { command }) => match command {
             Some(commands::Host::Start {}) => commands::host::start().await,
+            Some(commands::Host::Auth {}) => commands::auth(commands::UserType::Host).await?,
             None => {
                 println!("No files provided!")
             }
@@ -38,6 +38,7 @@ async fn main() -> Result<()> {
                 commands::developer::upload().await?;
                 println!("Phew... everything worked as promised! 🚀 ")
             }
+            Some(commands::Developer::Auth {}) => commands::auth(commands::UserType::Dev).await?,
             None => {
                 println!("No command provided!")
             }
@@ -46,7 +47,6 @@ async fn main() -> Result<()> {
             config::host::read_config();
         }
         Some(Commands::Init {}) => commands::init().await?,
-        Some(Commands::Auth {}) => commands::auth().await?,
         None => {}
     }
     Ok(())
