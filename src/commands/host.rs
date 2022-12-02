@@ -1,4 +1,5 @@
 use anyhow::Context;
+use tokio::process::Command;
 
 use crate::{
     commands, config,
@@ -8,11 +9,10 @@ use crate::{
 pub async fn start() {
     println!("Connecting to the ASPN cloud...");
 
-    // TODO: Check authentication?
     if !config::host::config_exist() {
-        commands::auth().await;
+        commands::auth(commands::UserType::Host).await;
     }
-    let db_project = api::storage::project::find(&1).await.unwrap();
+    let db_project = api::storage::project::find(&4).await.unwrap();
 
     config::project::save_project_connnection(&db_project).unwrap();
 
@@ -25,7 +25,10 @@ pub async fn start() {
 
     api::storage::host::online().await.unwrap();
     // Spin up microservice
-    // todo!("Use the dockerfile over wasm ");
-    // utils::wasm::start(format!("{}main.wasm", project.path.to_str().unwrap()).as_str())
-    //     .expect("Could not run the program");
+    utils::docker::build(
+        format!("{}Dockerfile", project.path.to_str().unwrap()).as_str(),
+        &project.name,
+    )
+    .await;
+    utils::docker::start(&project.name).await;
 }

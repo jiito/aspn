@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aspn::{commands, config};
 use clap::{Parser, Subcommand};
 #[derive(Parser, Debug)]
@@ -10,7 +11,6 @@ struct Args {
 enum Commands {
     Init {},
     Config {},
-    Auth {},
     Host {
         #[command(subcommand)]
         command: Option<commands::Host>,
@@ -22,21 +22,23 @@ enum Commands {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     let cli = Args::parse();
 
     match &cli.command {
         Some(Commands::Host { command }) => match command {
             Some(commands::Host::Start {}) => commands::host::start().await,
+            Some(commands::Host::Auth {}) => commands::auth(commands::UserType::Host).await?,
             None => {
                 println!("No files provided!")
             }
         },
         Some(Commands::Developer { command }) => match command {
             Some(commands::Developer::Upload {}) => {
-                commands::developer::upload().await.unwrap();
+                commands::developer::upload().await?;
                 println!("Phew... everything worked as promised! 🚀 ")
             }
+            Some(commands::Developer::Auth {}) => commands::auth(commands::UserType::Dev).await?,
             None => {
                 println!("No command provided!")
             }
@@ -44,8 +46,8 @@ async fn main() {
         Some(Commands::Config {}) => {
             config::host::read_config();
         }
-        Some(Commands::Init {}) => commands::init(),
-        Some(Commands::Auth {}) => commands::auth().await,
+        Some(Commands::Init {}) => commands::init().await?,
         None => {}
     }
+    Ok(())
 }
