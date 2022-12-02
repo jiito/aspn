@@ -3,7 +3,7 @@ pub mod storage;
 use anyhow::{Context, Result};
 use reqwest::{Body, Method};
 use serde::{Deserialize, Serialize};
-use std::{fs::File as StdFile, io::Cursor};
+use std::{fmt::format, fs::File as StdFile, io::Cursor};
 use tokio::fs::File;
 
 use crate::config;
@@ -50,11 +50,14 @@ pub async fn upload() -> Result<()> {
         .id
         .expect("Must have a project id in aspn.yaml. Please authenticate");
 
+    let project = storage::project::find(&project_id).await?;
     let entrypoint = config.service.entrypoint;
+
+    let file_uri = format!("{}/{}", project.calculate_hash(), entrypoint);
 
     let signed_url_res: SignedUrlResponse =
         gcs::request_signed_url(gcs::SignedURLRequest::Upload {
-            path: entrypoint.clone(),
+            path: file_uri.clone(),
         })
         .await?;
 
@@ -81,7 +84,7 @@ pub async fn upload() -> Result<()> {
 
     let func = models::NewFunction {
         project_id,
-        gcs_uri: entrypoint,
+        gcs_uri: file_uri,
         route: config.service.route,
     };
     storage::function::save(&func).await?;
