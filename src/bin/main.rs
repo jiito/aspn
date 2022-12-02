@@ -46,7 +46,7 @@ async fn main() -> Result<()> {
             config::host::read_config();
         }
         Some(Commands::Init {}) => commands::init().await?,
-        Some(Commands::Auth {}) => commands::auth().await,
+        Some(Commands::Auth {}) => commands::auth().await?,
         None => {}
     }
     Ok(())

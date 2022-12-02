@@ -45,14 +45,15 @@ pub struct NewProject<'a> {
 pub struct Developer {
     pub id: i32,
     pub name: String,
-    pub ip_address: ipnetwork::IpNetwork,
     pub project_id: Option<i32>,
+    pub auth_token: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewDeveloper {
     pub name: String,
     pub project_id: i32,
+    pub auth_token: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

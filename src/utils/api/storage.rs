@@ -88,7 +88,7 @@ pub mod host {
         utils::api::{self, models},
     };
 
-    pub async fn save(new_host: models::NewHost) -> Result<()> {
+    pub async fn save(new_host: models::NewHost) -> Result<models::Host> {
         let path = format!("/host");
         let res = api::request(Method::POST, &path[..], &Some(new_host)).await;
         res

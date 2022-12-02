@@ -29,9 +29,9 @@ pub async fn init() -> Result<()> {
             let config = config::dev::create_config(&name);
             config::dev::write(&config);
 
-            let developer_id = 0;
+            let developer = api::storage::developer::current().await?;
 
-            api::storage::project::save(&name, &developer_id).await?;
+            api::storage::project::save(&name, &developer.id).await?;
             println!("Successfully wrote config [aspn.yaml]");
         }
         Err(_) => println!("Couldn't get the project name"),
@@ -39,7 +39,7 @@ pub async fn init() -> Result<()> {
     Ok(())
 }
 
-pub async fn auth() {
+pub async fn auth() -> Result<()> {
     let device_code = utils::auth::request_device_code()
         .await
         .expect("Could not get device code");
@@ -52,14 +52,24 @@ pub async fn auth() {
         let user = utils::auth::get_user(&access_token.access_token)
             .await
             .expect("Could not get user");
-        println!("Successfully logged in!  Hello, {}!!", user.name);
 
         // TODO: find way to branch this before the host save
         config::host::save_token_to_config(&access_token.access_token);
+        let project_id = config::dev::read()?
+            .project
+            .id
+            .expect("Must set project ID in config.yaml");
+        let dev = models::NewDeveloper {
+            name: user.name,
+            project_id,
+            auth_token: Some(access_token.access_token.clone()),
+        };
         let host = models::NewHost {
-            ip_address: ipnetwork::IpNetwork::new(local_ip().unwrap(), 32).unwrap(),
+            ip_address: ipnetwork::IpNetwork::new(local_ip()?, 32)?,
             user_token: access_token.access_token,
         };
-        api::storage::host::save(host).await;
-    }
+        api::storage::developer::save(&dev).await?;
+        api::storage::host::save(host).await?;
+    };
+    Ok(())
 }
