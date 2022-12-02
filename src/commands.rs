@@ -7,6 +7,7 @@ use crate::{
         api::{self, models},
     },
 };
+use anyhow::Result;
 use clap::Subcommand;
 use local_ip_address::local_ip;
 use webbrowser;
@@ -20,17 +21,22 @@ pub enum Developer {
     Upload {},
 }
 
-pub fn init() {
+pub async fn init() -> Result<()> {
     let project_name = inquire::Text::new("What is the title of your project?").prompt();
 
     match project_name {
         Ok(name) => {
             let config = config::dev::create_config(&name);
             config::dev::write(&config);
-            println!("Successfully wrote config [aspn.yaml]")
+
+            let developer_id = 0;
+
+            api::storage::project::save(&name, &developer_id).await?;
+            println!("Successfully wrote config [aspn.yaml]");
         }
         Err(_) => println!("Couldn't get the project name"),
     }
+    Ok(())
 }
 
 pub async fn auth() {

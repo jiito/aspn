@@ -1,3 +1,4 @@
+use anyhow::Result;
 use aspn::{commands, config};
 use clap::{Parser, Subcommand};
 #[derive(Parser, Debug)]
@@ -22,7 +23,7 @@ enum Commands {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     let cli = Args::parse();
 
     match &cli.command {
@@ -34,7 +35,7 @@ async fn main() {
         },
         Some(Commands::Developer { command }) => match command {
             Some(commands::Developer::Upload {}) => {
-                commands::developer::upload().await.unwrap();
+                commands::developer::upload().await?;
                 println!("Phew... everything worked as promised! 🚀 ")
             }
             None => {
@@ -44,8 +45,9 @@ async fn main() {
         Some(Commands::Config {}) => {
             config::host::read_config();
         }
-        Some(Commands::Init {}) => commands::init(),
+        Some(Commands::Init {}) => commands::init().await?,
         Some(Commands::Auth {}) => commands::auth().await,
         None => {}
     }
+    Ok(())
 }
