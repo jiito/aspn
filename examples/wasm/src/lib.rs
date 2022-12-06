@@ -22,7 +22,7 @@ pub extern "C" fn greet() {
         })
         .unwrap();
 
-    let names: Vec<String> = (0..input.num).map(|_idx| input.name.clone()).collect();
+    let names = vec![String::from("Ben"), String::from("is")];
 
     let output = Output { names };
     let serialized = serde_json::to_string(&output)
