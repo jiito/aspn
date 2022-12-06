@@ -1,7 +1,10 @@
 pub mod developer;
 pub mod host;
 use crate::{
-    config,
+    config::{
+        self,
+        dev::{Config, DeveloperConfig},
+    },
     utils::{
         self,
         api::{self, models},
@@ -28,12 +31,14 @@ pub async fn init() -> Result<()> {
 
     match project_name {
         Ok(name) => {
-            let config = config::dev::create_config(&name);
-            config::dev::write(&config);
+            let mut config = config::dev::create_config(&name);
 
             let developer = api::storage::developer::current().await?;
 
-            api::storage::project::save(&name, &developer.id).await?;
+            let project = api::storage::project::save(&name, &developer.id).await?;
+
+            config.project.id = Some(project.id);
+            config::dev::write(&config);
             println!("Successfully wrote config [aspn.yaml]");
         }
         Err(_) => println!("Couldn't get the project name"),
@@ -65,13 +70,9 @@ pub async fn auth(user_type: UserType) -> Result<()> {
 
         match user_type {
             UserType::Dev => {
-                let project_id = config::dev::read()?
-                    .project
-                    .id
-                    .expect("Must set project ID in config.yaml");
                 let dev = models::NewDeveloper {
                     name: user.name,
-                    project_id,
+                    project_id: None,
                     auth_token: Some(access_token.access_token.clone()),
                 };
                 api::storage::developer::save(&dev).await?;
