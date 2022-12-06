@@ -12,7 +12,9 @@ pub async fn request<T: Serialize, U>(method: Method, route: &str, data: &Option
 where
     U: for<'de> Deserialize<'de>,
 {
-    println!("[API] {} | {}", method.as_str(), route);
+    if config::env::debug() {
+        println!("[API] {} | {}", method.as_str(), route);
+    }
     let client = reqwest::Client::new();
     let mut headers = reqwest::header::HeaderMap::new();
     headers.append(
@@ -22,7 +24,7 @@ where
 
     let body = Body::from(serde_json::to_string(data)?);
 
-    let uri = format!("http://localhost:8080{}", route);
+    let uri = format!("{}{}", config::env::api_url(), route);
 
     let res: U = client
         .request(method, uri)
