@@ -7,6 +7,4 @@ async fn main() {
     let res = utils::auth::request_access_token(res.device_code, res.interval)
         .await
         .unwrap();
-
-    println!("{}", res.access_token)
 }

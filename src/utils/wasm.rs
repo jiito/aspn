@@ -66,8 +66,6 @@ pub fn run(path: &str) -> Result<Output> {
         .into_inner();
     let output: Output = serde_json::from_slice(&contents)?;
 
-    println!("outputnames: {:?}", output.names);
-
     Ok(output)
 }
 #[cfg(test)]

@@ -100,7 +100,6 @@ pub async fn download(project_id: &i32) -> Result<()> {
     //find the functions related to the project
     let function = storage::function::find_by_project(project_id).await?;
 
-    println!("The Function is : {:?}", function);
     // download the function
 
     let signed_url_res: SignedUrlResponse =
@@ -152,7 +151,6 @@ mod gcs {
             SignedURLRequest::Download { path } => ("GET", urlencoding::encode(&path).to_string()),
         };
 
-        println!("{} : {}", method, path);
         let response: SignedUrlResponse = client
             .get("http://localhost:8080/signed_url") // TODO; move this to the API URL env var
             .query(&[("method", method), ("object_name", &path[..])])
@@ -162,7 +160,6 @@ mod gcs {
             .json::<SignedUrlResponse>()
             .await?;
 
-        println!("{:?}", response);
         Ok(response)
     }
 }
