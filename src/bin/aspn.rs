@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
 
     match &cli.command {
         Some(Commands::Host { command }) => match command {
-            Some(commands::Host::Start {}) => commands::host::start().await,
+            Some(commands::Host::Start {}) => commands::host::start().await?,
             Some(commands::Host::Auth {}) => commands::auth(commands::UserType::Host).await?,
             None => {
                 println!("No files provided!")

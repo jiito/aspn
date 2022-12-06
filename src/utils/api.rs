@@ -48,7 +48,7 @@ pub async fn upload() -> Result<()> {
     let project_id = config
         .project
         .id
-        .expect("Must have a project id in aspn.yaml. Please authenticate");
+        .expect("Must have a project id in aspn.yaml. Please authenticate.");
 
     let project = storage::project::find(&project_id).await?;
     let entrypoint = config.service.entrypoint;

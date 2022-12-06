@@ -17,7 +17,7 @@ pub struct Output {
     pub names: Vec<String>,
 }
 
-pub fn run(path: &str) -> Result<()> {
+pub fn run(path: &str) -> Result<Output> {
     // Define the WASI functions globally on the `Config`.
     let engine = Engine::default();
     let mut linker = Linker::new(&engine);
@@ -68,7 +68,7 @@ pub fn run(path: &str) -> Result<()> {
 
     println!("outputnames: {:?}", output.names);
 
-    Ok(())
+    Ok(output)
 }
 #[cfg(test)]
 mod tests {
