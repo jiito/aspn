@@ -63,7 +63,7 @@ pub mod project {
     pub async fn save(name: &str, developer_id: &i32) -> Result<models::Project> {
         let path = format!("/project");
         let res = api::request(
-            Method::GET,
+            Method::POST,
             &path[..],
             &Some(CreateProjectData { name, developer_id }),
         )
