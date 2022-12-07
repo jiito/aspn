@@ -30,3 +30,4 @@ wasmtime = "2.0.2"
 wasmtime-wasi = "2.0.2"
 wasi-common = "2.0.2"
 hyper = { version = "0.14", features = ["full"] }
+spinners = "4.1.0"
