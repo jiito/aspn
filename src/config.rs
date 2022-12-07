@@ -5,9 +5,9 @@ pub mod project;
 pub mod env {
 
     pub fn api_url() -> String {
-        std::env::var("API_URL").unwrap_or("localhost:8080".to_string())
+        std::env::var("API_URL").unwrap_or("http://localhost:8080".to_string())
     }
     pub fn debug() -> bool {
-        api_url().eq("localhost:8080")
+        api_url().eq("http://localhost:8080")
     }
 }
