@@ -68,14 +68,3 @@ pub fn run(path: &str) -> Result<Output> {
 
     Ok(output)
 }
-#[cfg(test)]
-mod tests {
-    use crate::utils::wasm::run;
-
-    #[test]
-    fn run_wasm_file() {
-        assert!(
-            run("/Users/bjar/git/aspn/examples/wasm/target/wasm32-wasi/debug/wasm.wasm").is_ok()
-        );
-    }
-}
