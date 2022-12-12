@@ -22,7 +22,11 @@ pub extern "C" fn greet() {
         })
         .unwrap();
 
-    let names = vec![String::from("Ben"), String::from("is")];
+    let names = vec![
+        String::from("Running"),
+        String::from("wasm code on"),
+        input.name,
+    ];
 
     let output = Output { names };
     let serialized = serde_json::to_string(&output)

@@ -16,7 +16,6 @@ pub async fn start(project: &models::Project) {
         // service_fn converts our function into a `Service`
         Ok::<_, Infallible>(service_fn(handler))
     });
-
     let server = Server::bind(&addr).serve(make_svc);
 
     // Run this server for... forever!

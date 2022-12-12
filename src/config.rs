@@ -8,6 +8,6 @@ pub mod env {
         option_env!("API_URL").unwrap_or("http://localhost:8080")
     }
     pub fn debug() -> bool {
-        api_url().eq("http://localhost:8080")
+        option_env!("ASPN_DEBUG").is_some()
     }
 }

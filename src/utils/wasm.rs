@@ -29,7 +29,7 @@ pub fn run(path: &PathBuf) -> Result<Output> {
 
     // TAKEN FROM https://github.com/pmalmgren/wasi-data-sharing/blob/shared-stdio-demo/examples/wasi/main.rs
     let input = Input {
-        name: "Rust".into(),
+        name: format!("{}", local_ip_address::local_ip().unwrap()),
         num: 10,
     };
     let serialized_input = serde_json::to_string(&input)?;
