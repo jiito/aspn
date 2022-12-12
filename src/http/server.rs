@@ -25,12 +25,13 @@ pub async fn start(project: &models::Project) {
     }
 }
 async fn handler(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
-    println!("[PROXY]: {:?}", _req.body());
-    let route = String::from("/wasm-hello-world");
+    println!("[PROXY]: {:?}", _req.uri().path());
+    // TODO: read this value form the config
+    let route = String::from("/cs-701-demo");
     let uri = _req.uri();
     let config = config::project::read_project_connection().expect("No connecte project");
     if uri.path().eq(&route) {
-        let wasm_res = utils::wasm::run(&config.path).unwrap();
+        let wasm_res = utils::wasm::run(&config.path.join("main.wasm")).unwrap();
         let json_str = serde_json::to_string(&wasm_res).unwrap();
         Ok(Response::new(json_str.into()))
     } else {

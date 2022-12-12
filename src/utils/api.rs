@@ -55,7 +55,8 @@ pub async fn upload() -> Result<()> {
     let project = storage::project::find(&project_id).await?;
     let entrypoint = config.service.entrypoint;
 
-    let file_uri = format!("{}/{}", project.calculate_hash(), entrypoint);
+    // TODO: find a better resolution with the entrypoint
+    let file_uri = format!("{}/{}", project.calculate_hash(), "main.wasm");
 
     let signed_url_res: SignedUrlResponse =
         gcs::request_signed_url(gcs::SignedURLRequest::Upload {
@@ -111,7 +112,7 @@ pub async fn download(project_id: &i32) -> Result<()> {
 
     // Create the file in the config dirtectory
     let project_dir = project.host_dir();
-    let mut dest = StdFile::create(format!("{}Dockerfile", project_dir.display()))?;
+    let mut dest = StdFile::create(format!("{}main.wasm", project_dir.display()))?;
 
     // TODO: abstract this above with interatcing with the signed urls
     let client = reqwest::Client::new();

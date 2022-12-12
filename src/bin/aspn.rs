@@ -36,7 +36,7 @@ async fn main() -> Result<()> {
         Some(Commands::Developer { command }) => match command {
             Some(commands::Developer::Upload {}) => {
                 commands::developer::upload().await?;
-                println!("Phew... everything worked as promised! 🚀 ")
+                println!("\nPhew... everything worked as promised! 🚀 ")
             }
             Some(commands::Developer::Auth {}) => commands::auth(commands::UserType::Dev).await?,
             None => {

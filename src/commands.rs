@@ -84,7 +84,7 @@ pub async fn auth(user_type: UserType) -> Result<()> {
             // TODO: find way to branch this before the host save
             config::host::save_token_to_config(&access_token.access_token);
             save_user(user_type, &access_token.access_token).await?;
-            println!("Successfully logged in as: {}", user.email);
+            println!("\nSuccessfully logged in as: {}", user.email);
         };
     }
     Ok(())

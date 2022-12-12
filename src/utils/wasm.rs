@@ -41,6 +41,7 @@ pub fn run(path: &PathBuf) -> Result<Output> {
         .stdin(Box::new(stdin.clone()))
         .stdout(Box::new(stdout.clone()))
         .build();
+    println!("PATH: {}", path.display());
     let module = Module::from_file(&engine, path)?;
 
     let mut store = Store::new(&engine, wasi);
