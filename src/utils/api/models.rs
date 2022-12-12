@@ -1,5 +1,6 @@
 use std::{
     collections::hash_map::DefaultHasher,
+    fmt,
     hash::{Hash, Hasher},
 };
 
@@ -12,6 +13,13 @@ use crate::config;
 pub struct Project {
     pub id: i32,
     pub name: String,
+}
+
+impl fmt::Display for Project {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Customize so only `x` and `y` are denoted.
+        write!(f, "{}", self.name)
+    }
 }
 
 impl Project {
@@ -44,14 +52,12 @@ pub struct NewProject<'a> {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Developer {
     pub id: i32,
-    pub name: String,
     pub project_id: Option<i32>,
     pub auth_token: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NewDeveloper {
-    pub name: String,
     pub project_id: Option<i32>,
     pub auth_token: Option<String>,
 }

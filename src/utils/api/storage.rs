@@ -75,6 +75,11 @@ pub mod project {
         let res = api::request(Method::GET, &path[..], &Some("{}")).await;
         res
     }
+    pub async fn find_all() -> Result<Vec<models::Project>> {
+        let path = format!("/project");
+        let res = api::request(Method::GET, &path[..], &Some("{}")).await;
+        res
+    }
 }
 
 pub mod host {

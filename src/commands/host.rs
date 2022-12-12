@@ -4,6 +4,7 @@ use tokio::process::Command;
 use crate::{
     commands, config, http,
     utils::{self, api},
+    with_loader,
 };
 
 pub async fn start() -> Result<()> {
@@ -12,26 +13,27 @@ pub async fn start() -> Result<()> {
     if !config::host::config_exist() {
         commands::auth(commands::UserType::Host).await?;
     }
-    let db_project = api::storage::project::find(&6).await.unwrap();
+    let db_projects = api::storage::project::find_all().await?;
 
-    config::project::save_project_connnection(&db_project).unwrap();
+    let selected_project = inquire::Select::new(
+        "Which ASPN project would you like to connect to?",
+        db_projects,
+    )
+    .prompt()?;
 
-    utils::api::download(&db_project.id).await.unwrap();
-    println!("Succesfully downloaded file...");
+    config::project::save_project_connnection(&selected_project)?;
 
-    let project = config::project::read_project_connection()
-        .with_context(|| "No Project Config")
-        .unwrap();
+    with_loader!(
+        utils::api::download(&selected_project.id).await?,
+        "Downloading the secret sauce..."
+    );
+    println!("Succesfully downloaded file 🏄‍♂️", );
 
-    api::storage::host::online().await.unwrap();
-    // Spin up microservice
+    api::storage::host::online().await?;
 
-    // utils::docker::build(
-    //     format!("{}Dockerfile", project.path.to_str().unwrap()).as_str(),
-    //     &project.name,
-    // )
-    // .await;
-    // utils::docker::start(&project.name).await;
-    http::server::start().await;
+    println!("Listening for requests on http://localhost:4011");
+    // TODO: Start this on its own thread
+    http::server::start(&selected_project).await;
+
     Ok(())
 }
