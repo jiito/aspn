@@ -1,4 +1,4 @@
-use std::io::Read;
+use std::{io::Read, path::PathBuf};
 use wasi_common::pipe::{ReadPipe, WritePipe};
 
 use anyhow::{Context, Result};
@@ -17,7 +17,7 @@ pub struct Output {
     pub names: Vec<String>,
 }
 
-pub fn run(path: &str) -> Result<Output> {
+pub fn run(path: &PathBuf) -> Result<Output> {
     // Define the WASI functions globally on the `Config`.
     let engine = Engine::default();
     let mut linker = Linker::new(&engine);

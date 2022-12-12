@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::utils;
+use crate::{utils, with_loader};
 
 pub async fn upload() -> Result<()> {
-    utils::api::upload().await
+    with_loader!(utils::api::upload().await, "Uploading your precious goods")
 }

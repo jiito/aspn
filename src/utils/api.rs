@@ -136,6 +136,7 @@ pub async fn download(project_id: &i32) -> Result<()> {
 
 mod gcs {
     use super::SignedUrlResponse;
+    use crate::config;
     use anyhow::{Context, Result};
 
     pub enum SignedURLRequest {
@@ -152,7 +153,7 @@ mod gcs {
         };
 
         let response: SignedUrlResponse = client
-            .get("http://localhost:8080/signed_url") // TODO; move this to the API URL env var
+            .get(format!("{}/signed_url", config::env::api_url())) // TODO; move this to the API URL env var
             .query(&[("method", method), ("object_name", &path[..])])
             .send()
             .await
