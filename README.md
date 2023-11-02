@@ -1,4 +1,4 @@
-# [aspn](aspn.network)
+# [aspn](https://aspn.vercel.app)
 
 `aspn` aims to be a decentralized network for hosting the web applications of the future.
 
